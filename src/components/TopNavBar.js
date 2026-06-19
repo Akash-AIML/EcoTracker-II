@@ -154,6 +154,21 @@ export function TopNavBar({ activeTab, setActiveTab }) {
               <MaterialIcons name="person-add" size={16} color={COLORS.primary} />
               <Text style={styles.addAccountText}>Add Account</Text>
             </TouchableOpacity>
+            
+            <View style={styles.dropdownDivider} />
+            <TouchableOpacity
+              style={styles.logoutBtn}
+              onPress={() => {
+                setUserId('');
+                setShowDropdown(false);
+                if (typeof window !== 'undefined') {
+                  window.location.reload();
+                }
+              }}
+            >
+              <MaterialIcons name="logout" size={16} color={COLORS.error} />
+              <Text style={styles.logoutText}>Log Out</Text>
+            </TouchableOpacity>
           </View>
         )}
       </View>
@@ -355,6 +370,18 @@ const styles = StyleSheet.create({
   },
   addAccountText: {
     color: COLORS.primary,
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  logoutBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    padding: 8,
+    borderRadius: 8,
+  },
+  logoutText: {
+    color: COLORS.error,
     fontSize: 12,
     fontWeight: '600',
   },

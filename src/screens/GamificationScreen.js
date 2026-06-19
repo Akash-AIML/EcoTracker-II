@@ -496,6 +496,20 @@ export function GamificationScreen() {
                   <MaterialIcons name="person-add" size={20} color={COLORS.primary} />
                   <Text style={styles.mobileAddAccountText}>Create New Account</Text>
                 </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={styles.mobileLogoutBtn}
+                  onPress={() => {
+                    setUserId('');
+                    setShowMobileSwitcher(false);
+                    if (typeof window !== 'undefined') {
+                      window.location.reload();
+                    }
+                  }}
+                >
+                  <MaterialIcons name="logout" size={20} color={COLORS.error} />
+                  <Text style={styles.mobileLogoutText}>Log Out</Text>
+                </TouchableOpacity>
               </>
             ) : (
               <View style={{ gap: 16 }}>
@@ -980,6 +994,23 @@ const styles = StyleSheet.create({
   },
   mobileAddAccountText: {
     color: COLORS.primary,
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  mobileLogoutBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 12,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: COLORS.error,
+    borderStyle: 'dashed',
+    gap: 8,
+    marginTop: 8,
+  },
+  mobileLogoutText: {
+    color: COLORS.error,
     fontSize: 14,
     fontWeight: '600',
   },

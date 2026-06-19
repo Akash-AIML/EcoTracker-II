@@ -15,6 +15,16 @@ app.use(express.json());
 // Log incoming request details for debugging
 app.use(morgan('dev'));
 
+// Root endpoint for health check & status checks
+app.get('/', (req, res) => {
+  res.json({
+    status: 'online',
+    service: 'EcoTrack AI Carbon Accounting API',
+    version: '1.0.0',
+    database: process.env.FIREBASE_SERVICE_ACCOUNT ? 'firestore' : 'local-mock'
+  });
+});
+
 // Mount our router on /api
 app.use('/api', routes);
 

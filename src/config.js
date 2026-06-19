@@ -4,9 +4,9 @@ export const API_BASE = process.env.EXPO_PUBLIC_API_BASE || 'http://localhost:50
 // Get current active user ID from local storage
 export function getUserId() {
   if (typeof window !== 'undefined' && window.localStorage) {
-    return window.localStorage.getItem('ecotrack_user_id') || 'sarah_j';
+    return window.localStorage.getItem('ecotrack_user_id') || null;
   }
-  return 'sarah_j';
+  return null;
 }
 
 // Set current active user ID to local storage

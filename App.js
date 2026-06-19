@@ -5,8 +5,10 @@ import { COLORS } from './src/theme/theme';
 import { useResponsive } from './src/hooks/useResponsive';
 import { TopNavBar } from './src/components/TopNavBar';
 import { BottomTabBar } from './src/components/BottomTabBar';
+import { getUserId } from './src/config';
 
 // Import Screens
+import { AuthScreen } from './src/screens/AuthScreen';
 import { LandingPageScreen } from './src/screens/LandingPageScreen';
 import { CarbonCalculatorScreen } from './src/screens/CarbonCalculatorScreen';
 import { InsightsScreen } from './src/screens/InsightsScreen';
@@ -17,6 +19,21 @@ import { MarketplaceScreen } from './src/screens/MarketplaceScreen';
 export default function App() {
   const { isDesktop } = useResponsive();
   const [activeTab, setActiveTab] = useState('home'); // home, calculate, analytics, projects, marketplace, impact
+
+  const currentUserId = getUserId();
+
+  if (!currentUserId) {
+    return (
+      <SafeAreaView style={styles.appContainer}>
+        <StatusBar style="light" backgroundColor={COLORS.background} />
+        <AuthScreen onLoginSuccess={() => {
+          if (typeof window !== 'undefined') {
+            window.location.reload();
+          }
+        }} />
+      </SafeAreaView>
+    );
+  }
 
   const renderActiveScreen = () => {
     switch (activeTab) {
