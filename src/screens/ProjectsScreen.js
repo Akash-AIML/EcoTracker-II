@@ -82,7 +82,14 @@ export function ProjectsScreen() {
           <GlassCard style={[styles.sectionCard, { flex: 1.2 }]}>
             <View style={styles.sectionTitleRow}>
               <Text style={styles.sectionTitle}>Active Carbon Projects</Text>
-              <TouchableOpacity style={styles.addBtn} onPress={() => setShowForm(!showForm)}>
+              <TouchableOpacity 
+                style={styles.addBtn} 
+                onPress={() => setShowForm(!showForm)}
+                accessible={true}
+                accessibilityRole="button"
+                accessibilityLabel={showForm ? 'Cancel project creation' : 'New Project'}
+                accessibilityHint="Toggles the visibility of the new project creation form"
+              >
                 <MaterialIcons name={showForm ? 'close' : 'add'} size={18} color={COLORS.primary} />
                 <Text style={styles.addBtnText}>{showForm ? 'Cancel' : 'New Project'}</Text>
               </TouchableOpacity>
@@ -97,6 +104,9 @@ export function ProjectsScreen() {
                   placeholderTextColor={COLORS.onSurfaceVariant}
                   value={projectTitle}
                   onChangeText={setProjectTitle}
+                  accessible={true}
+                  accessibilityLabel="Project Title input field"
+                  accessibilityHint="Enter the name or objective of your sustainability project"
                 />
 
                 <Text style={styles.formLabel}>TARGET / TIMELINE</Text>
@@ -106,9 +116,19 @@ export function ProjectsScreen() {
                   placeholderTextColor={COLORS.onSurfaceVariant}
                   value={projectTarget}
                   onChangeText={setProjectTarget}
+                  accessible={true}
+                  accessibilityLabel="Project Target input field"
+                  accessibilityHint="Enter target CO2 reduction and target timeline"
                 />
 
-                <TouchableOpacity style={styles.submitBtn} onPress={handleCreateProject}>
+                <TouchableOpacity 
+                  style={styles.submitBtn} 
+                  onPress={handleCreateProject}
+                  accessible={true}
+                  accessibilityRole="button"
+                  accessibilityLabel="Launch Project"
+                  accessibilityHint="Launches and lists this sustainability project under your active projects list"
+                >
                   <Text style={styles.submitBtnText}>Launch Project</Text>
                 </TouchableOpacity>
               </View>

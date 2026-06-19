@@ -96,6 +96,10 @@ export function TopNavBar({ activeTab, setActiveTab }) {
                 key={item.value}
                 onPress={() => setActiveTab(item.value)}
                 style={[styles.linkBtn, isActive && styles.activeLinkBtn]}
+                accessible={true}
+                accessibilityRole="tab"
+                accessibilityLabel={`Navigate to ${item.label}`}
+                accessibilityState={{ selected: isActive }}
               >
                 <Text style={[styles.linkText, isActive && styles.activeLinkText]}>
                   {item.label}
@@ -108,18 +112,40 @@ export function TopNavBar({ activeTab, setActiveTab }) {
 
       <View style={styles.rightContainer}>
         {/* User Switcher Dropdown Anchor */}
-        <TouchableOpacity style={styles.userSelector} onPress={() => setShowDropdown(!showDropdown)}>
+        <TouchableOpacity 
+          style={styles.userSelector} 
+          onPress={() => setShowDropdown(!showDropdown)}
+          accessible={true}
+          accessibilityRole="button"
+          accessibilityLabel={`Active profile: ${currentUser.name}. Select to switch user.`}
+        >
           <Text style={styles.userName}>{currentUser.name}</Text>
           <MaterialIcons name="arrow-drop-down" size={20} color={COLORS.primary} />
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.iconBtn}>
+        <TouchableOpacity 
+          style={styles.iconBtn}
+          accessible={true}
+          accessibilityRole="button"
+          accessibilityLabel="Open alerts notifications"
+        >
           <MaterialIcons name="notifications" size={22} color={COLORS.onSurfaceVariant} />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.iconBtn}>
+        <TouchableOpacity 
+          style={styles.iconBtn}
+          accessible={true}
+          accessibilityRole="button"
+          accessibilityLabel="Open application settings"
+        >
           <MaterialIcons name="settings" size={22} color={COLORS.onSurfaceVariant} />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.avatarContainer} onPress={() => setShowDropdown(!showDropdown)}>
+        <TouchableOpacity 
+          style={styles.avatarContainer} 
+          onPress={() => setShowDropdown(!showDropdown)}
+          accessible={true}
+          accessibilityRole="imagebutton"
+          accessibilityLabel="Switch active user profile avatar shortcut"
+        >
           <Image
             source={{ uri: currentUser.avatar }}
             style={styles.avatarImg}

@@ -58,7 +58,9 @@ class MockCollectionRef {
 
 class MockDb {
   constructor() {
-    this.filePath = path.join(__dirname, 'database.json');
+    this.filePath = process.env.NODE_ENV === 'test'
+      ? path.join(__dirname, 'database.test.json')
+      : path.join(__dirname, 'database.json');
     if (!fs.existsSync(this.filePath)) {
       // Seed initial users & historical records
       const initialSeed = {
@@ -278,7 +280,7 @@ if (!serviceAccount && fs.existsSync(keyPath)) {
   }
 }
 
-if (serviceAccount) {
+if (serviceAccount && process.env.NODE_ENV !== 'test') {
   try {
     initializeApp({
       credential: cert(serviceAccount)

@@ -144,7 +144,14 @@ export function LandingPageScreen({ onStartCalculator }) {
               </Text>
               <View style={styles.heroBtnGroup}>
                 <Animated.View style={{ transform: [{ scale: pulseAnim }] }}>
-                  <TouchableOpacity style={styles.primaryBtn} onPress={onStartCalculator}>
+                  <TouchableOpacity 
+                    style={styles.primaryBtn} 
+                    onPress={onStartCalculator}
+                    accessible={true}
+                    accessibilityRole="button"
+                    accessibilityLabel="Calculate My Footprint"
+                    accessibilityHint="Launches the step-by-step carbon footprint calculator wizard"
+                  >
                     <Text style={styles.primaryBtnText}>Calculate My Footprint</Text>
                   </TouchableOpacity>
                 </Animated.View>
@@ -252,7 +259,14 @@ export function LandingPageScreen({ onStartCalculator }) {
                 Join the 1,500+ enterprises and thousands of eco-conscious users using EcoTrack AI to reach Net Zero.
               </Text>
               <Animated.View style={{ transform: [{ scale: pulseAnim }] }}>
-                <TouchableOpacity style={styles.ctaBtn} onPress={onStartCalculator}>
+                <TouchableOpacity 
+                  style={styles.ctaBtn} 
+                  onPress={onStartCalculator}
+                  accessible={true}
+                  accessibilityRole="button"
+                  accessibilityLabel="Calculate My Footprint bottom CTA"
+                  accessibilityHint="Launches the step-by-step carbon footprint calculator wizard"
+                >
                   <Text style={styles.ctaBtnText}>Calculate My Footprint</Text>
                 </TouchableOpacity>
               </Animated.View>
@@ -271,7 +285,12 @@ export function LandingPageScreen({ onStartCalculator }) {
               </View>
               <Text style={styles.mobileLogoText}>EcoTrack AI</Text>
             </View>
-            <TouchableOpacity style={styles.mobileNotifyBtn}>
+            <TouchableOpacity 
+              style={styles.mobileNotifyBtn}
+              accessible={true}
+              accessibilityRole="button"
+              accessibilityLabel="Open notifications"
+            >
               <MaterialIcons name="notifications" size={20} color={COLORS.onSurface} />
             </TouchableOpacity>
           </View>
@@ -295,7 +314,14 @@ export function LandingPageScreen({ onStartCalculator }) {
               Track emissions, receive AI-powered insights, and build a greener future.
             </Text>
             <Animated.View style={{ width: '100%', transform: [{ scale: pulseAnim }] }}>
-              <TouchableOpacity style={styles.mobileJourneyBtn} onPress={onStartCalculator}>
+              <TouchableOpacity 
+                style={styles.mobileJourneyBtn} 
+                onPress={onStartCalculator}
+                accessible={true}
+                accessibilityRole="button"
+                accessibilityLabel="Calculate My Footprint"
+                accessibilityHint="Launches the step-by-step carbon footprint calculator wizard"
+              >
                 <Text style={styles.mobileJourneyBtnText}>Calculate My Footprint</Text>
               </TouchableOpacity>
             </Animated.View>

@@ -154,7 +154,14 @@ export function MarketplaceScreen() {
 
               <View style={styles.actionRow}>
                 <Text style={styles.costText}>${offset.cost} <Text style={styles.costUnit}>/ share</Text></Text>
-                <TouchableOpacity style={styles.sponsorBtn} onPress={() => handleSponsor(offset)}>
+                <TouchableOpacity 
+                  style={styles.sponsorBtn} 
+                  onPress={() => handleSponsor(offset)}
+                  accessible={true}
+                  accessibilityRole="button"
+                  accessibilityLabel={`Sponsor ${offset.title}`}
+                  accessibilityHint={`Sponsors this offset project for ${offset.cost} dollars, securing ${offset.offset} carbon reduction`}
+                >
                   <Text style={styles.sponsorBtnText}>Sponsor Project</Text>
                 </TouchableOpacity>
               </View>
@@ -186,7 +193,14 @@ export function MarketplaceScreen() {
 
               <Text style={styles.modalCaption}>Points and offsets have been credited. Check your leaderboard ranking in the Impact tab!</Text>
               
-              <TouchableOpacity style={styles.closeBtn} onPress={() => setSuccessModalVisible(false)}>
+              <TouchableOpacity 
+                style={styles.closeBtn} 
+                onPress={() => setSuccessModalVisible(false)}
+                accessible={true}
+                accessibilityRole="button"
+                accessibilityLabel="Return to Marketplace"
+                accessibilityHint="Closes confirmation modal and returns to the project listing screen"
+              >
                 <Text style={styles.closeBtnText}>Return to Marketplace</Text>
               </TouchableOpacity>
             </GlassCard>

@@ -206,6 +206,10 @@ export function GamificationScreen() {
       key={item.id}
       onPress={() => handleProgressChallenge(item.id)}
       activeOpacity={0.95}
+      accessible={true}
+      accessibilityRole="button"
+      accessibilityLabel={`Challenge: ${item.title}. Value: ${item.points}. Progress: ${Math.round(item.progress * 100)} percent. ${item.completed ? 'Completed' : 'Time left: ' + item.timeLeft}`}
+      accessibilityHint="Tap to advance the progress of this challenge"
     >
       <GlassCard style={styles.challengeCard}>
         <View style={styles.challengeCardHeader}>
@@ -276,6 +280,10 @@ export function GamificationScreen() {
                         activeOpacity={0.8}
                         onPress={() => handleTapBadge(idx)}
                         style={[styles.badgeCell, !badge.active && styles.badgeLocked]}
+                        accessible={true}
+                        accessibilityRole="button"
+                        accessibilityLabel={`Badge: ${badge.name}. Status: ${badge.active ? 'Unlocked' : 'Locked'}`}
+                        accessibilityHint="Tap to trigger a spring animation effect on the badge"
                       >
                         <View style={[
                           styles.badgeIconOuter,
@@ -296,7 +304,11 @@ export function GamificationScreen() {
             <View style={styles.columnRight}>
               <View style={styles.leaderboardHeaderRow}>
                 <Text style={styles.sectionHeading}>Global Leaderboard</Text>
-                <TouchableOpacity>
+                <TouchableOpacity
+                  accessible={true}
+                  accessibilityRole="button"
+                  accessibilityLabel="View all leaderboard entries"
+                >
                   <Text style={styles.viewAllText}>View All</Text>
                 </TouchableOpacity>
               </View>
@@ -328,7 +340,12 @@ export function GamificationScreen() {
                 ))}
               </View>
 
-              <TouchableOpacity style={styles.discoverBtn}>
+              <TouchableOpacity 
+                style={styles.discoverBtn}
+                accessible={true}
+                accessibilityRole="button"
+                accessibilityLabel="Discover more carbon reduction challenges"
+              >
                 <Text style={styles.discoverBtnText}>Discover More Challenges</Text>
               </TouchableOpacity>
             </View>
@@ -342,7 +359,13 @@ export function GamificationScreen() {
           {/* Header */}
           <View style={styles.mobileHeader}>
             <View style={styles.mobileHeaderLeft}>
-              <TouchableOpacity style={styles.mobileAvatarBox} onPress={() => setShowMobileSwitcher(true)}>
+              <TouchableOpacity 
+                style={styles.mobileAvatarBox} 
+                onPress={() => setShowMobileSwitcher(true)}
+                accessible={true}
+                accessibilityRole="imagebutton"
+                accessibilityLabel="Open user account and profile switching menu"
+              >
                 <Image
                   source={{ uri: profile.avatar }}
                   style={styles.mobileAvatar}
@@ -350,7 +373,12 @@ export function GamificationScreen() {
               </TouchableOpacity>
               <Text style={styles.mobileTitleText}>EcoTrack AI</Text>
             </View>
-            <TouchableOpacity style={styles.notifyBtn}>
+            <TouchableOpacity 
+              style={styles.notifyBtn}
+              accessible={true}
+              accessibilityRole="button"
+              accessibilityLabel="Open notifications"
+            >
               <MaterialIcons name="notifications" size={20} color={COLORS.onSurface} />
             </TouchableOpacity>
           </View>
@@ -385,7 +413,11 @@ export function GamificationScreen() {
           <GlassCard style={styles.leaderboardCardMobile}>
             <View style={styles.leaderboardHeaderMobile}>
               <Text style={styles.sectionTitleMobile}>Leaderboard</Text>
-              <TouchableOpacity>
+              <TouchableOpacity
+                accessible={true}
+                accessibilityRole="button"
+                accessibilityLabel="View all leaderboard entries"
+              >
                 <Text style={styles.viewAllText}>View All</Text>
               </TouchableOpacity>
             </View>
@@ -428,6 +460,10 @@ export function GamificationScreen() {
                     activeOpacity={0.8}
                     onPress={() => handleTapBadge(idx)}
                     style={[styles.badgeCell, !badge.active && styles.badgeLocked]}
+                    accessible={true}
+                    accessibilityRole="button"
+                    accessibilityLabel={`Badge: ${badge.name}. Status: ${badge.active ? 'Unlocked' : 'Locked'}`}
+                    accessibilityHint="Tap to trigger a spring animation effect on the badge"
                   >
                     <View style={[
                       styles.badgeIconOuter,
@@ -444,7 +480,12 @@ export function GamificationScreen() {
           </View>
 
           {/* CTA */}
-          <TouchableOpacity style={styles.discoverBtnMobile}>
+          <TouchableOpacity 
+            style={styles.discoverBtnMobile}
+            accessible={true}
+            accessibilityRole="button"
+            accessibilityLabel="Discover more carbon reduction challenges"
+          >
             <Text style={styles.discoverBtnText}>Discover More Challenges</Text>
           </TouchableOpacity>
         </View>
@@ -456,12 +497,17 @@ export function GamificationScreen() {
           <View style={styles.modalContent}>
             <View style={styles.modalHeaderMobile}>
               <Text style={styles.modalTitle}>Manage Accounts</Text>
-              <TouchableOpacity onPress={() => {
-                setShowMobileSwitcher(false);
-                setShowMobileCreate(false);
-                setNewName('');
-                setNewEmail('');
-              }}>
+              <TouchableOpacity 
+                onPress={() => {
+                  setShowMobileSwitcher(false);
+                  setShowMobileCreate(false);
+                  setNewName('');
+                  setNewEmail('');
+                }}
+                accessible={true}
+                accessibilityRole="button"
+                accessibilityLabel="Close accounts management modal"
+              >
                 <MaterialIcons name="close" size={24} color={COLORS.onSurface} />
               </TouchableOpacity>
             </View>
@@ -474,6 +520,10 @@ export function GamificationScreen() {
                       key={user.id}
                       style={[styles.mobileUserItem, user.id === currentUserId && styles.activeMobileUserItem]}
                       onPress={() => handleSwitchUserMobile(user.id)}
+                      accessible={true}
+                      accessibilityRole="button"
+                      accessibilityLabel={`Switch to user ${user.name}, ${user.points} points, ${user.title}`}
+                      accessibilityHint="Select to make this your active user profile"
                     >
                       <Image source={{ uri: user.avatar }} style={styles.mobileUserAvatar} />
                       <View style={{ flex: 1 }}>
@@ -492,6 +542,10 @@ export function GamificationScreen() {
                 <TouchableOpacity
                   style={styles.mobileAddAccountBtn}
                   onPress={() => setShowMobileCreate(true)}
+                  accessible={true}
+                  accessibilityRole="button"
+                  accessibilityLabel="Create New Account"
+                  accessibilityHint="Navigates to the sign up form to create a new user profile"
                 >
                   <MaterialIcons name="person-add" size={20} color={COLORS.primary} />
                   <Text style={styles.mobileAddAccountText}>Create New Account</Text>
@@ -506,6 +560,10 @@ export function GamificationScreen() {
                       window.location.reload();
                     }
                   }}
+                  accessible={true}
+                  accessibilityRole="button"
+                  accessibilityLabel="Log Out"
+                  accessibilityHint="Clears active session and returns to login screen"
                 >
                   <MaterialIcons name="logout" size={20} color={COLORS.error} />
                   <Text style={styles.mobileLogoutText}>Log Out</Text>
@@ -523,6 +581,9 @@ export function GamificationScreen() {
                     placeholderTextColor="rgba(255,255,255,0.3)"
                     value={newName}
                     onChangeText={setNewName}
+                    accessible={true}
+                    accessibilityLabel="Full Name input field"
+                    accessibilityHint="Enter your full name to register a new profile"
                   />
                 </View>
 
@@ -535,6 +596,9 @@ export function GamificationScreen() {
                     keyboardType="email-address"
                     value={newEmail}
                     onChangeText={setNewEmail}
+                    accessible={true}
+                    accessibilityLabel="Email Address input field"
+                    accessibilityHint="Enter your email address to register a new profile"
                   />
                 </View>
 
@@ -547,6 +611,10 @@ export function GamificationScreen() {
                       setNewEmail('');
                     }}
                     disabled={isCreating}
+                    accessible={true}
+                    accessibilityRole="button"
+                    accessibilityLabel="Back"
+                    accessibilityHint="Returns to accounts switcher"
                   >
                     <Text style={styles.cancelBtnText}>Back</Text>
                   </TouchableOpacity>
@@ -555,6 +623,10 @@ export function GamificationScreen() {
                     style={[styles.createBtn, !newName.trim() && styles.disabledBtn]} 
                     onPress={handleCreateUserMobile}
                     disabled={isCreating || !newName.trim()}
+                    accessible={true}
+                    accessibilityRole="button"
+                    accessibilityLabel="Create and Switch profile"
+                    accessibilityHint="Registers the profile with the entered name and email and logs you in"
                   >
                     <Text style={styles.createBtnText}>
                       {isCreating ? 'Creating...' : 'Create & Switch'}

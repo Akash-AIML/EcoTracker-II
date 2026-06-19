@@ -621,13 +621,42 @@ router.get('/users', async (req, res) => {
 // 13c. Create a new user
 router.post('/users', async (req, res) => {
   const { name, email } = req.body;
-  if (!name) {
-    return res.status(400).json({ error: 'Missing name' });
+
+  if (!name || typeof name !== 'string' || !name.trim()) {
+    return res.status(400).json({ error: 'Name is required and must be a valid string' });
+  }
+
+  if (name.length > 50) {
+    return res.status(400).json({ error: 'Name must be under 50 characters' });
+  }
+
+  // Sanitize name to prevent XSS
+  const sanitizedName = name.replace(/<[^>]*>/g, '').trim();
+  if (!sanitizedName) {
+    return res.status(400).json({ error: 'Invalid name characters' });
+  }
+
+  // If email is provided, validate its format
+  let validatedEmail = email || '';
+  if (validatedEmail) {
+    if (typeof validatedEmail !== 'string') {
+      return res.status(400).json({ error: 'Email must be a valid string' });
+    }
+    if (validatedEmail.length > 100) {
+      return res.status(400).json({ error: 'Email must be under 100 characters' });
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(validatedEmail.trim())) {
+      return res.status(400).json({ error: 'Invalid email address format' });
+    }
+    validatedEmail = validatedEmail.trim();
   }
 
   try {
+    const trimmedName = sanitizedName;
+    
     // Generate unique slug ID
-    let baseId = name.toLowerCase().trim()
+    let baseId = trimmedName.toLowerCase()
       .replace(/[^\w\s-]/g, '')
       .replace(/[\s_-]+/g, '_')
       .replace(/^-+|-+$/g, '');
@@ -646,11 +675,11 @@ router.post('/users', async (req, res) => {
       counter++;
     }
 
-    const avatarUrl = `https://api.dicebear.com/7.x/avataaars/png?seed=${encodeURIComponent(name)}`;
+    const avatarUrl = `https://api.dicebear.com/7.x/avataaars/png?seed=${encodeURIComponent(trimmedName)}`;
 
     const newProfile = {
-      email: email || `${userId}@example.com`,
-      name: name,
+      email: validatedEmail || `${userId}@example.com`,
+      name: trimmedName,
       avatar: avatarUrl,
       title: 'Eco Novice',
       points: 0,

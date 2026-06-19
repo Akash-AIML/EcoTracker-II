@@ -425,10 +425,22 @@ export function InsightsScreen({ setActiveTab }) {
             <View style={styles.sectionTitleRow}>
               <Text style={styles.sectionTitleInside}>Goal Setting</Text>
               <View style={{ flexDirection: 'row', gap: 12 }}>
-                <TouchableOpacity onPress={() => setActiveTab && setActiveTab('projects')}>
+                <TouchableOpacity 
+                  onPress={() => setActiveTab && setActiveTab('projects')}
+                  accessible={true}
+                  accessibilityRole="link"
+                  accessibilityLabel="Manage Projects"
+                  accessibilityHint="Navigates to the Projects screen to view net-zero projects"
+                >
                   <Text style={[styles.actionText, { color: COLORS.secondary }]}>Manage Projects</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => setShowGoalForm(!showGoalForm)}>
+                <TouchableOpacity 
+                  onPress={() => setShowGoalForm(!showGoalForm)}
+                  accessible={true}
+                  accessibilityRole="button"
+                  accessibilityLabel={showGoalForm ? 'Cancel goal creation' : 'Add new Goal'}
+                  accessibilityHint="Toggles the visibility of the new goal creation form"
+                >
                   <Text style={styles.actionText}>{showGoalForm ? 'Cancel' : '+ New Goal'}</Text>
                 </TouchableOpacity>
               </View>
@@ -436,12 +448,15 @@ export function InsightsScreen({ setActiveTab }) {
 
             {showGoalForm && (
               <View style={styles.goalForm}>
-                <TextInput
+                 <TextInput
                   style={styles.input}
                   placeholder="Goal Title (e.g. Reduce meat consumption)"
                   placeholderTextColor={COLORS.onSurfaceVariant}
                   value={goalTitle}
                   onChangeText={setGoalTitle}
+                  accessible={true}
+                  accessibilityLabel="Goal Title input field"
+                  accessibilityHint="Enter the description of your sustainability goal"
                 />
                 <TextInput
                   style={styles.input}
@@ -449,8 +464,18 @@ export function InsightsScreen({ setActiveTab }) {
                   placeholderTextColor={COLORS.onSurfaceVariant}
                   value={goalTarget}
                   onChangeText={setGoalTarget}
+                  accessible={true}
+                  accessibilityLabel="Goal Target input field"
+                  accessibilityHint="Enter the target metric or frequency for this goal"
                 />
-                <TouchableOpacity style={styles.addGoalBtn} onPress={handleAddGoal}>
+                <TouchableOpacity 
+                  style={styles.addGoalBtn} 
+                  onPress={handleAddGoal}
+                  accessible={true}
+                  accessibilityRole="button"
+                  accessibilityLabel="Create Goal"
+                  accessibilityHint="Submits and registers your new sustainability goal"
+                >
                   <Text style={styles.addGoalText}>Create Goal</Text>
                 </TouchableOpacity>
               </View>
@@ -482,7 +507,14 @@ export function InsightsScreen({ setActiveTab }) {
                   <Text style={styles.offsetTitle}>Tree Planting</Text>
                 </View>
                 <Text style={styles.offsetDesc}>Offsets up to 22 kg CO₂ yearly per mature tree.</Text>
-                <TouchableOpacity style={styles.offsetActionBtn} onPress={() => setActiveTab && setActiveTab('marketplace')}>
+                <TouchableOpacity 
+                  style={styles.offsetActionBtn} 
+                  onPress={() => setActiveTab && setActiveTab('marketplace')}
+                  accessible={true}
+                  accessibilityRole="button"
+                  accessibilityLabel="Sponsor Tree, cost 5 dollars"
+                  accessibilityHint="Navigates to the marketplace to sponsor tree planting"
+                >
                   <Text style={styles.offsetActionText}>Sponsor Tree (-$5)</Text>
                 </TouchableOpacity>
               </View>
@@ -493,7 +525,14 @@ export function InsightsScreen({ setActiveTab }) {
                   <Text style={styles.offsetTitle}>Solar Charger Panels</Text>
                 </View>
                 <Text style={styles.offsetDesc}>Estimated carbon offset: 35 kg CO₂ yearly.</Text>
-                <TouchableOpacity style={styles.offsetActionBtn} onPress={() => setActiveTab && setActiveTab('marketplace')}>
+                <TouchableOpacity 
+                  style={styles.offsetActionBtn} 
+                  onPress={() => setActiveTab && setActiveTab('marketplace')}
+                  accessible={true}
+                  accessibilityRole="button"
+                  accessibilityLabel="Adopt solar charger offsets"
+                  accessibilityHint="Navigates to the marketplace to sponsor solar panels"
+                >
                   <Text style={styles.offsetActionText}>Adopt offsets</Text>
                 </TouchableOpacity>
               </View>
@@ -508,7 +547,14 @@ export function InsightsScreen({ setActiveTab }) {
               <MaterialIcons name="smart-toy" size={28} color={COLORS.primary} />
               <Text style={styles.aiTitle}>AI Sustainability Coach</Text>
             </View>
-            <TouchableOpacity style={styles.refreshBtn} onPress={handleAskAICoach}>
+            <TouchableOpacity 
+              style={styles.refreshBtn} 
+              onPress={handleAskAICoach}
+              accessible={true}
+              accessibilityRole="button"
+              accessibilityLabel="Ask AI Coach"
+              accessibilityHint="Regenerates personalized carbon footprint reduction recommendations from the AI Coach"
+            >
               <MaterialIcons name="refresh" size={18} color={COLORS.primary} />
               <Text style={styles.refreshText}>Ask AI Coach</Text>
             </TouchableOpacity>

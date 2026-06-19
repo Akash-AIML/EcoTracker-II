@@ -100,6 +100,10 @@ export function AuthScreen({ onLoginSuccess }) {
                     key={user.id}
                     style={styles.userCard}
                     onPress={() => handleSelectUser(user.id)}
+                    accessible={true}
+                    accessibilityRole="button"
+                    accessibilityLabel={`Login as ${user.name}, ${user.points} points, ${user.title}`}
+                    accessibilityHint="Select to sign in as this user profile"
                   >
                     <Image source={{ uri: user.avatar }} style={styles.avatar} />
                     <View style={styles.userInfo}>
@@ -114,7 +118,14 @@ export function AuthScreen({ onLoginSuccess }) {
 
             <View style={styles.divider} />
 
-            <TouchableOpacity style={styles.registerToggleBtn} onPress={() => setIsRegistering(true)}>
+            <TouchableOpacity 
+              style={styles.registerToggleBtn} 
+              onPress={() => setIsRegistering(true)}
+              accessible={true}
+              accessibilityRole="button"
+              accessibilityLabel="Create New Account"
+              accessibilityHint="Navigates to the sign up form to create a new user profile"
+            >
               <MaterialIcons name="person-add" size={18} color={COLORS.primary} />
               <Text style={styles.registerToggleText}>Create New Account</Text>
             </TouchableOpacity>
@@ -132,6 +143,9 @@ export function AuthScreen({ onLoginSuccess }) {
                 placeholderTextColor="rgba(255, 255, 255, 0.3)"
                 value={newName}
                 onChangeText={setNewName}
+                accessible={true}
+                accessibilityLabel="Full Name input field"
+                accessibilityHint="Enter your full name to register a new profile"
               />
             </View>
 
@@ -144,6 +158,9 @@ export function AuthScreen({ onLoginSuccess }) {
                 keyboardType="email-address"
                 value={newEmail}
                 onChangeText={setNewEmail}
+                accessible={true}
+                accessibilityLabel="Email Address input field"
+                accessibilityHint="Enter your email address to register a new profile"
               />
             </View>
 
@@ -156,6 +173,10 @@ export function AuthScreen({ onLoginSuccess }) {
                   setNewEmail('');
                 }}
                 disabled={isCreating}
+                accessible={true}
+                accessibilityRole="button"
+                accessibilityLabel="Back to Login"
+                accessibilityHint="Returns to the profile selection screen"
               >
                 <Text style={styles.backBtnText}>Back to Login</Text>
               </TouchableOpacity>
@@ -164,6 +185,10 @@ export function AuthScreen({ onLoginSuccess }) {
                 style={[styles.submitBtn, !newName.trim() && styles.disabledBtn]}
                 onPress={handleCreateUser}
                 disabled={isCreating || !newName.trim()}
+                accessible={true}
+                accessibilityRole="button"
+                accessibilityLabel="Create and Login"
+                accessibilityHint="Registers your account with the entered name and email, and signs you in"
               >
                 <Text style={styles.submitBtnText}>
                   {isCreating ? 'Registering...' : 'Create & Login'}

@@ -227,6 +227,11 @@ export function CarbonCalculatorScreen({ onBackHome }) {
                         style={[styles.modeBtn, isActive && styles.modeBtnActive]}
                         onPress={() => handleSelectMode(item.value)}
                         activeOpacity={0.8}
+                        accessible={true}
+                        accessibilityRole="button"
+                        accessibilityLabel={`Commute Mode: ${item.label}`}
+                        accessibilityState={{ selected: isActive }}
+                        accessibilityHint={`Select ${item.label} as your commute mode`}
                       >
                         <MaterialIcons
                           name={item.icon}
@@ -264,6 +269,8 @@ export function CarbonCalculatorScreen({ onBackHome }) {
                 minimumTrackTintColor={COLORS.primary}
                 maximumTrackTintColor={COLORS.surfaceContainerHighest}
                 thumbTintColor={COLORS.primary}
+                accessible={true}
+                accessibilityLabel="Daily commute distance slider"
               />
               <View style={styles.sliderLabels}>
                 <Text style={styles.sliderLabel}>0km</Text>
@@ -292,6 +299,8 @@ export function CarbonCalculatorScreen({ onBackHome }) {
                 minimumTrackTintColor={COLORS.primary}
                 maximumTrackTintColor={COLORS.surfaceContainerHighest}
                 thumbTintColor={COLORS.primary}
+                accessible={true}
+                accessibilityLabel="Commuting frequency slider"
               />
             </GlassCard>
 
@@ -306,6 +315,10 @@ export function CarbonCalculatorScreen({ onBackHome }) {
                     style={styles.dropdownBtn}
                     onPress={() => setShowFuelDropdown(!showFuelDropdown)}
                     activeOpacity={0.9}
+                    accessible={true}
+                    accessibilityRole="combobox"
+                    accessibilityLabel="Vehicle fuel type selector"
+                    accessibilityHint="Expands options to select your vehicle's fuel type"
                   >
                     <Text style={styles.dropdownBtnText}>
                       {fuelOptions.find((f) => f.value === fuelType)?.label || 'Gasoline'}
@@ -323,6 +336,11 @@ export function CarbonCalculatorScreen({ onBackHome }) {
                             setFuelType(opt.value);
                             setShowFuelDropdown(false);
                           }}
+                          accessible={true}
+                          accessibilityRole="checkbox"
+                          accessibilityLabel={opt.label}
+                          accessibilityState={{ checked: fuelType === opt.value }}
+                          accessibilityHint={`Select ${opt.label}`}
                         >
                           <Text style={[styles.dropdownItemText, fuelType === opt.value && styles.dropdownItemTextActive]}>
                             {opt.label}
@@ -363,6 +381,8 @@ export function CarbonCalculatorScreen({ onBackHome }) {
                 minimumTrackTintColor={COLORS.primary}
                 maximumTrackTintColor={COLORS.surfaceContainerHighest}
                 thumbTintColor={COLORS.primary}
+                accessible={true}
+                accessibilityLabel="Monthly electricity units slider"
               />
               <View style={styles.sliderLabels}>
                 <Text style={styles.sliderLabel}>0 kWh</Text>
@@ -396,6 +416,11 @@ export function CarbonCalculatorScreen({ onBackHome }) {
                       key={diet.value}
                       style={[styles.dietCard, isActive && styles.dietCardActive]}
                       onPress={() => setFoodType(diet.value)}
+                      accessible={true}
+                      accessibilityRole="button"
+                      accessibilityLabel={`Dietary Profile: ${diet.label}. Description: ${diet.desc}`}
+                      accessibilityState={{ selected: isActive }}
+                      accessibilityHint={`Select ${diet.label} profile`}
                     >
                       <Text style={[styles.dietLabel, isActive && styles.dietLabelActive]}>{diet.label}</Text>
                       <Text style={styles.dietDesc}>{diet.desc}</Text>
@@ -424,6 +449,8 @@ export function CarbonCalculatorScreen({ onBackHome }) {
                     onValueChange={(val) => setChickenFreq(val)}
                     minimumTrackTintColor={COLORS.primary}
                     thumbTintColor={COLORS.primary}
+                    accessible={true}
+                    accessibilityLabel="Weekly poultry or chicken consumption frequency slider"
                   />
                 </GlassCard>
 
@@ -441,6 +468,8 @@ export function CarbonCalculatorScreen({ onBackHome }) {
                     onValueChange={(val) => setMuttonFreq(val)}
                     minimumTrackTintColor={COLORS.primary}
                     thumbTintColor={COLORS.primary}
+                    accessible={true}
+                    accessibilityLabel="Weekly red meat or mutton consumption frequency slider"
                   />
                 </GlassCard>
 
@@ -458,6 +487,8 @@ export function CarbonCalculatorScreen({ onBackHome }) {
                     onValueChange={(val) => setBeefFreq(val)}
                     minimumTrackTintColor={COLORS.primary}
                     thumbTintColor={COLORS.primary}
+                    accessible={true}
+                    accessibilityLabel="Weekly beef or pork consumption frequency slider"
                   />
                 </GlassCard>
 
@@ -475,6 +506,8 @@ export function CarbonCalculatorScreen({ onBackHome }) {
                     onValueChange={(val) => setFishFreq(val)}
                     minimumTrackTintColor={COLORS.primary}
                     thumbTintColor={COLORS.primary}
+                    accessible={true}
+                    accessibilityLabel="Weekly seafood or fish consumption frequency slider"
                   />
                 </GlassCard>
               </View>
@@ -505,6 +538,8 @@ export function CarbonCalculatorScreen({ onBackHome }) {
                 minimumTrackTintColor={COLORS.primary}
                 maximumTrackTintColor={COLORS.surfaceContainerHighest}
                 thumbTintColor={COLORS.primary}
+                accessible={true}
+                accessibilityLabel="Plastic usage frequency slider"
               />
               <View style={styles.sliderLabels}>
                 <Text style={styles.sliderLabel}>Low waste</Text>
@@ -521,6 +556,10 @@ export function CarbonCalculatorScreen({ onBackHome }) {
                   style={styles.dropdownBtn}
                   onPress={() => setShowRecycleDropdown(!showRecycleDropdown)}
                   activeOpacity={0.9}
+                  accessible={true}
+                  accessibilityRole="combobox"
+                  accessibilityLabel="Recycling habits selector"
+                  accessibilityHint="Expands options to select your recycling habits"
                 >
                   <Text style={styles.dropdownBtnText}>
                     {recycleOptions.find((r) => r.value === recycleHabit)?.label || 'Partial Recycling'}
@@ -538,6 +577,11 @@ export function CarbonCalculatorScreen({ onBackHome }) {
                           setRecycleHabit(opt.value);
                           setShowRecycleDropdown(false);
                         }}
+                        accessible={true}
+                        accessibilityRole="checkbox"
+                        accessibilityLabel={opt.label}
+                        accessibilityState={{ checked: recycleHabit === opt.value }}
+                        accessibilityHint={`Select ${opt.label}`}
                       >
                         <Text style={[styles.dropdownItemText, recycleHabit === opt.value && styles.dropdownItemTextActive]}>
                           {opt.label}
@@ -571,6 +615,8 @@ export function CarbonCalculatorScreen({ onBackHome }) {
                 onValueChange={(val) => setClothesBought(val)}
                 minimumTrackTintColor={COLORS.primary}
                 thumbTintColor={COLORS.primary}
+                accessible={true}
+                accessibilityLabel="Monthly clothes purchased items slider"
               />
             </GlassCard>
 
@@ -588,6 +634,8 @@ export function CarbonCalculatorScreen({ onBackHome }) {
                 onValueChange={(val) => setOnlineOrders(val)}
                 minimumTrackTintColor={COLORS.primary}
                 thumbTintColor={COLORS.primary}
+                accessible={true}
+                accessibilityLabel="Monthly online packages or orders count slider"
               />
             </GlassCard>
 
@@ -605,6 +653,8 @@ export function CarbonCalculatorScreen({ onBackHome }) {
                 onValueChange={(val) => setElectronicsBought(val)}
                 minimumTrackTintColor={COLORS.primary}
                 thumbTintColor={COLORS.primary}
+                accessible={true}
+                accessibilityLabel="Monthly major electronics items purchased slider"
               />
             </GlassCard>
           </View>
@@ -697,7 +747,14 @@ export function CarbonCalculatorScreen({ onBackHome }) {
       ]}>
         <View style={[styles.estimateContent, isDesktop && styles.desktopEstimateContent]}>
           <View style={styles.wizardNavBtns}>
-            <TouchableOpacity style={styles.backBtn} onPress={handleBackStep}>
+            <TouchableOpacity 
+              style={styles.backBtn} 
+              onPress={handleBackStep}
+              accessible={true}
+              accessibilityRole="button"
+              accessibilityLabel={currentStep === 1 ? 'CANCEL' : 'BACK'}
+              accessibilityHint={currentStep === 1 ? 'Cancel calculation and return home' : 'Go back to previous step'}
+            >
               <Text style={styles.backBtnText}>
                 {currentStep === 1 ? 'CANCEL' : 'BACK'}
               </Text>
@@ -705,6 +762,10 @@ export function CarbonCalculatorScreen({ onBackHome }) {
             <TouchableOpacity 
               style={[styles.nextBtn, currentStep === 6 && { backgroundColor: COLORS.secondary }]} 
               onPress={handleNextStep}
+              accessible={true}
+              accessibilityRole="button"
+              accessibilityLabel={currentStep === 6 ? 'SAVE FOOTPRINT' : 'NEXT STEP'}
+              accessibilityHint={currentStep === 6 ? 'Saves this footprint calculation to your history' : 'Go to next step of the calculator'}
             >
               <Text style={[styles.nextBtnText, currentStep === 6 && { color: COLORS.onSecondary }]}>
                 {currentStep === 6 ? 'SAVE FOOTPRINT' : 'NEXT STEP'}
