@@ -1,5 +1,7 @@
 # EcoTrack AI - Full-Spectrum Carbon Intelligence Platform
 
+**Live Deployment (Vercel):** [https://eco-tracker-virid.vercel.app/](https://eco-tracker-virid.vercel.app/)
+
 EcoTrack AI is a modern, responsive, and secure carbon footprint intelligence platform designed for individuals and enterprises to understand, track, and reduce their environmental impact. Built with React Native (Expo) and Node.js, the platform offers dynamic calculation metrics, personalized AI coaching, green gamification leaderboards, and an offset marketplace.
 
 ---
