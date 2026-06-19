@@ -1,6 +1,0 @@
-node_modules/
-firebase-key.json
-database.json
-*adminsdk*.json
-*.json.key
-*.key.json

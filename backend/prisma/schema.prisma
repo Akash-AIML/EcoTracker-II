@@ -1,0 +1,85 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+}
+
+model User {
+  id          String       @id @default(cuid())
+  name        String
+  email       String       @unique
+  createdAt   DateTime     @default(now()) @map("created_at")
+  updatedAt   DateTime     @updatedAt @map("updated_at")
+  assessments Assessment[]
+
+  @@map("users")
+}
+
+model Assessment {
+  id                  String           @id @default(cuid())
+  userId              String           @map("user_id")
+  // Input data
+  dailyCarKm          Float            @default(0) @map("daily_car_km")
+  carFuelType         String           @default("none") @map("car_fuel_type")
+  publicTransportKmPerWeek Float       @default(0) @map("public_transport_km_per_week")
+  cyclingKmPerWeek    Float            @default(0) @map("cycling_km_per_week")
+  shortFlightsPerYear Int              @default(0) @map("short_flights_per_year")
+  longFlightsPerYear  Int              @default(0) @map("long_flights_per_year")
+  monthlyElectricityKwh Float          @default(0) @map("monthly_electricity_kwh")
+  renewablePercentage Float            @default(0) @map("renewable_percentage")
+  dietType            String           @default("mixed") @map("diet_type")
+  clothingItemsPerYear Int             @default(0) @map("clothing_items_per_year")
+  electronicsItemsPerYear Int          @default(0) @map("electronics_items_per_year")
+  // Calculated emissions (kg CO2 per year)
+  transportEmission   Float            @map("transport_emission")
+  energyEmission      Float            @map("energy_emission")
+  foodEmission        Float            @map("food_emission")
+  shoppingEmission    Float            @map("shopping_emission")
+  totalEmission       Float            @map("total_emission")
+  sustainabilityScore Int              @map("sustainability_score")
+  createdAt           DateTime         @default(now()) @map("created_at")
+  user                User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  recommendations     Recommendation[]
+  simulations         Simulation[]
+
+  @@index([userId])
+  @@index([createdAt])
+  @@map("assessments")
+}
+
+model Recommendation {
+  id               String     @id @default(cuid())
+  assessmentId     String     @map("assessment_id")
+  title            String
+  description      String
+  estimatedSavings Float      @map("estimated_savings")
+  priority         String     // HIGH | MEDIUM | LOW
+  category         String     // transport | energy | food | shopping
+  createdAt        DateTime   @default(now()) @map("created_at")
+  assessment       Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+
+  @@index([assessmentId])
+  @@map("recommendations")
+}
+
+model Simulation {
+  id                 String     @id @default(cuid())
+  assessmentId       String     @map("assessment_id")
+  scenarioName       String     @map("scenario_name")
+  scenarioParams     Json       @map("scenario_params")
+  originalEmission   Float      @map("original_emission")
+  projectedEmission  Float      @map("projected_emission")
+  reductionPercentage Float     @map("reduction_percentage")
+  annualSavingsKg    Float      @map("annual_savings_kg")
+  createdAt          DateTime   @default(now()) @map("created_at")
+  assessment         Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+
+  @@index([assessmentId])
+  @@map("simulations")
+}
