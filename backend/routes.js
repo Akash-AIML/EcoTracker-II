@@ -139,7 +139,7 @@ router.get('/insights', async (req, res) => {
       totalMonthly: totalMonthly,
       complianceRate: userData.complianceRate || '90.0%',
       percentages: percentages,
-      recommendations: generateRecommendations(totalMonthly, percentages)
+      recommendations: await generateRecommendations(totalMonthly, percentages)
     });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -373,7 +373,46 @@ router.post('/goals', async (req, res) => {
 });
 
 // Helper to generate AI recommendations
-function generateRecommendations(footprint, breakdown) {
+async function generateRecommendations(footprint, breakdown) {
+  const apiKey = process.env.GROQ_API_KEY;
+  if (apiKey) {
+    try {
+      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          model: 'llama-3.1-8b-instant',
+          messages: [
+            {
+              role: 'system',
+              content: 'You are an expert AI Sustainability Coach. You analyze a user\'s carbon footprint (in kg CO2e) and category percentage breakdown (transport, electricity, food, waste, shopping). You must return exactly 3 highly actionable, personalized recommendations to help the user reduce their footprint. Return the recommendations as a JSON object containing a "recommendations" array. Each recommendation in the array must be an object with fields: "title" (under 40 characters), "desc" (1-2 sentences with concrete tips), "icon" (MaterialIcons icon name), and "color" (hex color code).'
+            },
+            {
+              role: 'user',
+              content: `Carbon Footprint: ${footprint} kg CO2e. Percentage breakdown: Transport: ${breakdown?.transport || 0}%, Electricity: ${breakdown?.electricity || 0}%, Food: ${breakdown?.food || 0}%, Waste: ${breakdown?.waste || 0}%, Shopping: ${breakdown?.shopping || 0}%.`
+            }
+          ],
+          response_format: { type: 'json_object' }
+        })
+      });
+      if (response.ok) {
+        const data = await response.json();
+        const content = JSON.parse(data.choices[0].message.content);
+        if (content && Array.isArray(content.recommendations) && content.recommendations.length > 0) {
+          return content.recommendations;
+        }
+      } else {
+        console.error('Groq API responded with error:', response.status, await response.text());
+      }
+    } catch (err) {
+      console.error('Error fetching Groq recommendation:', err);
+    }
+  }
+
+  // Fallback to static recommendations
   const transportPct = breakdown?.transport || 45;
   const electricityPct = breakdown?.electricity || 20;
   const foodPct = breakdown?.food || 20;
@@ -432,9 +471,9 @@ function generateRecommendations(footprint, breakdown) {
 }
 
 // 9. Get AI sustainability recommendations
-router.post('/ai/recommend', (req, res) => {
+router.post('/ai/recommend', async (req, res) => {
   const { footprint, breakdown } = req.body;
-  const recs = generateRecommendations(footprint, breakdown);
+  const recs = await generateRecommendations(footprint, breakdown);
   res.json({ recommendations: recs });
 });
 
