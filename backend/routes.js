@@ -7,6 +7,11 @@ let usersCache = null;
 let usersCacheTime = 0;
 const CACHE_TTL = 10000; // 10 seconds
 
+/**
+ * Retrieves all users from Firestore with a short-lived cache (10 seconds)
+ * to optimize read efficiency and limit database requests.
+ * @returns {Promise<Array<Object>>} A list of all user profiles.
+ */
 async function getAllUsersCached() {
   const now = Date.now();
   if (usersCache && (now - usersCacheTime < CACHE_TTL)) {
@@ -88,7 +93,11 @@ const defaultChallenges = [
   },
 ];
 
-// Helper to get active user ID from request
+/**
+ * Helper to retrieve the active user ID from request headers or query params
+ * @param {express.Request} req - Express request object
+ * @returns {string} active user ID
+ */
 function getRequestUserId(req) {
   return req.headers['x-user-id'] || req.query.userId || 'sarah_j';
 }
@@ -97,13 +106,24 @@ function getRequestUserId(req) {
 // API Endpoints (Firestore Powered)
 // ==========================================
 
-// 1. Get Calculator Config Presets
+/**
+ * GET /api/config
+ * Retrieves carbon footprint factors and multipliers configuration presets.
+ * @route GET /api/config
+ * @returns {Object} 200 - Static config presets
+ */
 router.get('/config', (req, res) => {
   res.json(staticConfig);
 });
 
-// 2. Get User Profile info
-router.get('/profile', async (req, res) => {
+/**
+ * GET /api/profile
+ * Retrieves profile information for the active user, creating a default one if not found.
+ * @route GET /api/profile
+ * @returns {Object} 200 - User profile data object
+ * @returns {Object} 500 - Internal server error
+ */
+router.get('/profile', async (req, res, next) => {
   const userId = getRequestUserId(req);
   try {
     const userDoc = await db.collection('users').doc(userId).get();
@@ -126,15 +146,20 @@ router.get('/profile', async (req, res) => {
       res.json(defaultProfile);
     }
   } catch (err) {
-    console.error('Error in /profile:', err);
-    res.status(500).json({ error: err.message });
+    next(err);
   }
 });
 
 let statsCache = null;
 let statsCacheTime = 0;
 
-// 3. Get global ticker statistics (landing page)
+/**
+ * GET /api/stats
+ * Retrieves global platform usage/sustainability metrics for the landing page.
+ * Uses a short-lived cache (10 seconds).
+ * @route GET /api/stats
+ * @returns {Object} 200 - Global metrics payload
+ */
 router.get('/stats', async (req, res) => {
   const now = Date.now();
   if (statsCache && (now - statsCacheTime < 10000)) {
@@ -163,8 +188,14 @@ router.get('/stats', async (req, res) => {
   }
 });
 
-// 3b. Get Dashboard Insights
-router.get('/insights', async (req, res) => {
+/**
+ * GET /api/insights
+ * Retrieves current footprint total, compliance rate, carbon share percentages, and AI recommendations.
+ * @route GET /api/insights
+ * @returns {Object} 200 - User insights payload
+ * @returns {Object} 500 - Internal server error
+ */
+router.get('/insights', async (req, res, next) => {
   const userId = getRequestUserId(req);
   try {
     const userDoc = await db.collection('users').doc(userId).get();
@@ -180,11 +211,18 @@ router.get('/insights', async (req, res) => {
       recommendations: await generateRecommendations(totalMonthly, percentages)
     });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    next(err);
   }
 });
 
-// 4. Calculate Full-Spectrum Carbon Footprint
+/**
+ * POST /api/carbon/calculate
+ * Calculates carbon footprint based on transport, electricity, food, waste, and shopping habits.
+ * @route POST /api/carbon/calculate
+ * @param {Object} req.body - Footprint details
+ * @returns {Object} 200 - Computation results with monthly/yearly emissions and category breakdowns
+ * @returns {Object} 400 - Validation error payload
+ */
 router.post('/carbon/calculate', (req, res) => {
   const { transport, electricity, food, waste, shopping } = req.body;
 
@@ -282,8 +320,16 @@ router.post('/carbon/calculate', (req, res) => {
   });
 });
 
-// 5. Save footprint calculation to database history
-router.post('/footprint/save', async (req, res) => {
+/**
+ * POST /api/footprint/save
+ * Saves a footprint calculation to database history and updates user stats / points.
+ * @route POST /api/footprint/save
+ * @param {Object} req.body - Footprint computation values to store
+ * @returns {Object} 200 - Saved status, updated history, and updated profile
+ * @returns {Object} 400 - Validation error payload
+ * @returns {Object} 500 - Internal server error
+ */
+router.post('/footprint/save', async (req, res, next) => {
   const userId = getRequestUserId(req);
   const { monthlyEmission, breakdown } = req.body;
 
@@ -345,12 +391,18 @@ router.post('/footprint/save', async (req, res) => {
       profile: updatedProfile
     });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    next(err);
   }
 });
 
-// 6. Get Historical calculations timeline
-router.get('/history', async (req, res) => {
+/**
+ * GET /api/history
+ * Retrieves the historical timeline of carbon calculation submissions.
+ * @route GET /api/history
+ * @returns {Array<Object>} 200 - Array of historical emission data points
+ * @returns {Object} 500 - Internal server error
+ */
+router.get('/history', async (req, res, next) => {
   const userId = getRequestUserId(req);
   try {
     const snapshot = await db.collection('users').doc(userId).collection('history').get();
@@ -378,12 +430,18 @@ router.get('/history', async (req, res) => {
 
     res.json(historyList);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    next(err);
   }
 });
 
-// 7. Get user goals
-router.get('/goals', async (req, res) => {
+/**
+ * GET /api/goals
+ * Retrieves active carbon reduction goals for the current user.
+ * @route GET /api/goals
+ * @returns {Array<Object>} 200 - List of active goals
+ * @returns {Object} 500 - Internal server error
+ */
+router.get('/goals', async (req, res, next) => {
   const userId = getRequestUserId(req);
   try {
     const snapshot = await db.collection('users').doc(userId).collection('goals').get();
@@ -403,12 +461,20 @@ router.get('/goals', async (req, res) => {
 
     res.json(goalsList);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    next(err);
   }
 });
 
-// 8. Add user goal
-router.post('/goals', async (req, res) => {
+/**
+ * POST /api/goals
+ * Adds a new carbon reduction goal for the current user and awards 50 points.
+ * @route POST /api/goals
+ * @param {Object} req.body - Goal metadata (title, target)
+ * @returns {Object} 200 - Goal creation success status, list of goals, and updated profile
+ * @returns {Object} 400 - Validation error payload
+ * @returns {Object} 500 - Internal server error
+ */
+router.post('/goals', async (req, res, next) => {
   const userId = getRequestUserId(req);
   const { title, target } = req.body;
   
@@ -457,11 +523,16 @@ router.post('/goals', async (req, res) => {
 
     res.json({ success: true, goal: newGoal, goals: goalsList, profile: updatedProfile });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    next(err);
   }
 });
 
-// Helper to generate AI recommendations
+/**
+ * Helper to generate AI sustainability recommendations using Groq's Llama model or static fallbacks.
+ * @param {number} footprint - Monthly carbon footprint in kg CO2e
+ * @param {Object} breakdown - Breakdown percentages per carbon category
+ * @returns {Promise<Array<Object>>} A promise that resolves to exactly 3 recommendations
+ */
 async function generateRecommendations(footprint, breakdown) {
   const apiKey = process.env.GROQ_API_KEY;
   if (apiKey) {
@@ -559,15 +630,32 @@ async function generateRecommendations(footprint, breakdown) {
   return recs;
 }
 
-// 9. Get AI sustainability recommendations
-router.post('/ai/recommend', async (req, res) => {
-  const { footprint, breakdown } = req.body;
-  const recs = await generateRecommendations(footprint, breakdown);
-  res.json({ recommendations: recs });
+/**
+ * POST /api/ai/recommend
+ * Returns AI sustainability recommendations given a footprint weight and breakdown.
+ * @route POST /api/ai/recommend
+ * @param {Object} req.body - Footprint details
+ * @returns {Object} 200 - Object containing recommendations array
+ * @returns {Object} 500 - Internal server error
+ */
+router.post('/ai/recommend', async (req, res, next) => {
+  try {
+    const { footprint, breakdown } = req.body;
+    const recs = await generateRecommendations(footprint, breakdown);
+    res.json({ recommendations: recs });
+  } catch (err) {
+    next(err);
+  }
 });
 
-// 10. Get challenges
-router.get('/challenges', async (req, res) => {
+/**
+ * GET /api/challenges
+ * Retrieves list of all challenges with user-specific progress.
+ * @route GET /api/challenges
+ * @returns {Array<Object>} 200 - Array of challenge templates with user progress values
+ * @returns {Object} 500 - Internal server error
+ */
+router.get('/challenges', async (req, res, next) => {
   const userId = getRequestUserId(req);
   try {
     const snapshot = await db.collection('users').doc(userId).collection('challenges').get();
@@ -591,12 +679,20 @@ router.get('/challenges', async (req, res) => {
 
     res.json(userChallenges);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    next(err);
   }
 });
 
-// 11. Join challenge
-router.post('/challenges/:id/join', async (req, res) => {
+/**
+ * POST /api/challenges/:id/join
+ * Joins a specific challenge for the current user, setting starting progress to 5%.
+ * @route POST /api/challenges/:id/join
+ * @param {string} req.params.id - Challenge ID ('1', '2', or '3')
+ * @returns {Object} 200 - Success status payload
+ * @returns {Object} 400 - Invalid challenge ID error
+ * @returns {Object} 500 - Internal server error
+ */
+router.post('/challenges/:id/join', async (req, res, next) => {
   const userId = getRequestUserId(req);
   const chId = req.params.id;
   if (chId !== '1' && chId !== '2' && chId !== '3') {
@@ -610,12 +706,20 @@ router.post('/challenges/:id/join', async (req, res) => {
     usersCache = null; // Invalidate cache
     res.json({ success: true });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    next(err);
   }
 });
 
-// 12. Update progress / complete challenge
-router.post('/challenges/:id/progress', async (req, res) => {
+/**
+ * POST /api/challenges/:id/progress
+ * Increments progress of a joined challenge by 10%, rewarding points on completion.
+ * @route POST /api/challenges/:id/progress
+ * @param {string} req.params.id - Challenge ID ('1', '2', or '3')
+ * @returns {Object} 200 - Success status, updated challenge progress, and user profile details
+ * @returns {Object} 400 - Invalid challenge ID error
+ * @returns {Object} 500 - Internal server error
+ */
+router.post('/challenges/:id/progress', async (req, res, next) => {
   const userId = getRequestUserId(req);
   const chId = req.params.id;
   if (chId !== '1' && chId !== '2' && chId !== '3') {
@@ -682,12 +786,18 @@ router.post('/challenges/:id/progress', async (req, res) => {
       profile: updatedProfile
     });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    next(err);
   }
 });
 
-// 13. Get leaderboard
-router.get('/leaderboard', async (req, res) => {
+/**
+ * GET /api/leaderboard
+ * Retrieves leaderboard list sorted by points.
+ * @route GET /api/leaderboard
+ * @returns {Array<Object>} 200 - List of ranked user objects
+ * @returns {Object} 500 - Internal server error
+ */
+router.get('/leaderboard', async (req, res, next) => {
   try {
     const users = await getAllUsersCached();
     const formattedUsers = users.map(user => ({
@@ -726,12 +836,18 @@ router.get('/leaderboard', async (req, res) => {
 
     res.json(rankedLeaderboard);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    next(err);
   }
 });
 
-// 13b. Get all users
-router.get('/users', async (req, res) => {
+/**
+ * GET /api/users
+ * Retrieves simple metadata objects for all registered platform users.
+ * @route GET /api/users
+ * @returns {Array<Object>} 200 - Array of user metadata items
+ * @returns {Object} 500 - Internal server error
+ */
+router.get('/users', async (req, res, next) => {
   try {
     const users = await getAllUsersCached();
     const usersList = users.map(user => ({
@@ -744,12 +860,20 @@ router.get('/users', async (req, res) => {
     }));
     res.json(usersList);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    next(err);
   }
 });
 
-// 13c. Create a new user
-router.post('/users', async (req, res) => {
+/**
+ * POST /api/users
+ * Creates / registers a new user profile on the platform, resolving unique slug IDs.
+ * @route POST /api/users
+ * @param {Object} req.body - Payload specifying 'name' and optional 'email'
+ * @returns {Object} 200 - Registration success payload containing the generated userId and profile
+ * @returns {Object} 400 - Validation error payload
+ * @returns {Object} 500 - Internal server error
+ */
+router.post('/users', async (req, res, next) => {
   const { name, email } = req.body;
 
   if (!name || typeof name !== 'string' || !name.trim()) {
@@ -829,12 +953,20 @@ router.post('/users', async (req, res) => {
     });
   } catch (err) {
     console.error('Error creating user:', err);
-    res.status(500).json({ error: err.message });
+    next(err);
   }
 });
 
-// 14. Purchase carbon offset
-router.post('/offsets/purchase', async (req, res) => {
+/**
+ * POST /api/offsets/purchase
+ * Purchases a carbon offset package, rewarding points to the buyer.
+ * @route POST /api/offsets/purchase
+ * @param {Object} req.body - Details containing offsetId and cost
+ * @returns {Object} 200 - Purchase success payload and updated profile points details
+ * @returns {Object} 400 - Validation error payload
+ * @returns {Object} 500 - Internal server error
+ */
+router.post('/offsets/purchase', async (req, res, next) => {
   const userId = getRequestUserId(req);
   const { offsetId, cost } = req.body;
 
@@ -869,7 +1001,7 @@ router.post('/offsets/purchase', async (req, res) => {
       profile: updatedProfile
     });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    next(err);
   }
 });
 

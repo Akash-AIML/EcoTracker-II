@@ -46,17 +46,17 @@ export function InsightsScreen({ setActiveTab }) {
   const [complianceRateCount, setComplianceRateCount] = useState(0);
 
   // Fetch backend data
-  const loadDashboardData = () => {
+  const loadDashboardData = React.useCallback(() => {
     // 1. Fetch Insights (totals, breakdown, recommendations)
     fetch(`${API_BASE}/insights`, { headers: getHeaders() })
       .then((res) => res.json())
       .then((data) => {
         if (data && !data.error) {
-          setTotalMonthly(parseFloat(data.totalMonthly));
-          setComplianceRate(data.complianceRate);
-          setPercentages(data.percentages);
-          setRecommendations(data.recommendations);
-          animateTickers(parseFloat(data.totalMonthly), parseFloat(data.complianceRate));
+          setTotalMonthly(parseFloat(data.totalMonthly ?? 0));
+          setComplianceRate(data.complianceRate ?? '90.0%');
+          setPercentages(data.percentages ?? { transport: 20, electricity: 20, food: 20, waste: 20, shopping: 20 });
+          setRecommendations(data.recommendations ?? []);
+          animateTickers(parseFloat(data.totalMonthly ?? 0), parseFloat(data.complianceRate ?? 0));
         }
       })
       .catch((err) => console.log('Error loading dashboard insights:', err));
@@ -65,7 +65,7 @@ export function InsightsScreen({ setActiveTab }) {
     fetch(`${API_BASE}/goals`, { headers: getHeaders() })
       .then((res) => res.json())
       .then((data) => {
-        if (data && !data.error) setGoals(data);
+        if (data && !data.error) setGoals(data ?? []);
       })
       .catch((err) => console.log('Error loading goals:', err));
 
@@ -73,14 +73,14 @@ export function InsightsScreen({ setActiveTab }) {
     fetch(`${API_BASE}/history`, { headers: getHeaders() })
       .then((res) => res.json())
       .then((data) => {
-        if (data && !data.error) setHistory(data);
+        if (data && !data.error) setHistory(data ?? []);
       })
       .catch((err) => console.log('Error loading timeline history:', err));
-  };
+  }, []);
 
   useEffect(() => {
     loadDashboardData();
-  }, []);
+  }, [loadDashboardData]);
 
   const animateTickers = (totalTarget, complianceTarget) => {
     let currentTotal = 0;
@@ -104,18 +104,18 @@ export function InsightsScreen({ setActiveTab }) {
   };
 
   // Add new Goal handler
-  const handleAddGoal = () => {
-    if (!goalTitle) return;
+  const handleAddGoal = React.useCallback(() => {
+    if (!goalTitle || !goalTitle.trim()) return;
 
     fetch(`${API_BASE}/goals`, {
       method: 'POST',
       headers: getHeaders(),
-      body: JSON.stringify({ title: goalTitle, target: goalTarget })
+      body: JSON.stringify({ title: goalTitle.trim(), target: goalTarget })
     })
       .then((res) => res.json())
       .then((data) => {
         if (data && data.success) {
-          setGoals(data.goals);
+          setGoals(data.goals ?? []);
           setGoalTitle('');
           setGoalTarget('');
           setShowGoalForm(false);
@@ -124,10 +124,10 @@ export function InsightsScreen({ setActiveTab }) {
         }
       })
       .catch((err) => console.log('Error adding goal:', err));
-  };
+  }, [goalTitle, goalTarget, loadDashboardData]);
 
   // Regeneration of AI tips
-  const handleAskAICoach = () => {
+  const handleAskAICoach = React.useCallback(() => {
     fetch(`${API_BASE}/ai/recommend`, {
       method: 'POST',
       headers: getHeaders(),
@@ -140,11 +140,17 @@ export function InsightsScreen({ setActiveTab }) {
         }
       })
       .catch((err) => console.log('Error regenerating AI recommendations:', err));
-  };
+  }, [totalMonthly, percentages]);
 
-  // Line chart coordinates helper
-  const renderLineChart = () => {
-    if (!history || history.length === 0) return null;
+  // Line chart coordinates helper wrapped in useMemo
+  const lineChartComponent = React.useMemo(() => {
+    if (!history || history.length === 0) {
+      return (
+        <View style={{ height: 200, justifyContent: 'center', alignItems: 'center' }}>
+          <Text style={{ color: COLORS.onSurfaceVariant, fontSize: 14 }}>No history data available yet.</Text>
+        </View>
+      );
+    }
 
     const width = 500;
     const height = 200;
@@ -156,7 +162,7 @@ export function InsightsScreen({ setActiveTab }) {
     const chartWidth = width - paddingLeft - paddingRight;
     const chartHeight = height - paddingTop - paddingBottom;
 
-    const amounts = history.map(h => h.amount);
+    const amounts = history.map(h => h.amount ?? 0);
     const maxVal = Math.max(...amounts, 160);
     const minVal = 0;
     const valRange = maxVal - minVal;
@@ -164,7 +170,7 @@ export function InsightsScreen({ setActiveTab }) {
     // Calculate points
     const points = history.map((record, index) => {
       const x = paddingLeft + (index / (history.length - 1)) * chartWidth;
-      const y = paddingTop + chartHeight - ((record.amount - minVal) / valRange) * chartHeight;
+      const y = paddingTop + chartHeight - (((record.amount ?? 0) - minVal) / valRange) * chartHeight;
       return { x, y, record };
     });
 
@@ -195,7 +201,6 @@ export function InsightsScreen({ setActiveTab }) {
             </LinearGradient>
           </Defs>
 
-          {/* Grid lines */}
           {ticks.map((tick, index) => {
             const yVal = paddingTop + chartHeight - tick * chartHeight;
             const labelVal = Math.round(minVal + tick * valRange);
@@ -222,27 +227,12 @@ export function InsightsScreen({ setActiveTab }) {
             );
           })}
 
-          {/* Filled Area */}
-          {areaPathD ? (
-            <Path d={areaPathD} fill="url(#areaGrad)" />
-          ) : null}
+          {areaPathD ? <Path d={areaPathD} fill="url(#areaGrad)" /> : null}
+          {linePathD ? <Path d={linePathD} fill="none" stroke={COLORS.primary} strokeWidth={3} /> : null}
 
-          {/* Chart Line */}
-          {linePathD ? (
-            <Path d={linePathD} fill="none" stroke={COLORS.primary} strokeWidth={3} />
-          ) : null}
-
-          {/* Data Points and values */}
           {points.map((pt, index) => (
             <G key={index}>
-              <Circle
-                cx={pt.x}
-                cy={pt.y}
-                r={5}
-                fill={COLORS.primary}
-                stroke="#fff"
-                strokeWidth={1.5}
-              />
+              <Circle cx={pt.x} cy={pt.y} r={5} fill={COLORS.primary} stroke="#fff" strokeWidth={1.5} />
               <SvgText
                 x={pt.x}
                 y={pt.y - 10}
@@ -251,7 +241,7 @@ export function InsightsScreen({ setActiveTab }) {
                 textAnchor="middle"
                 fontWeight="700"
               >
-                {`${pt.record.amount}kg`}
+                {`${pt.record.amount ?? 0}kg`}
               </SvgText>
               <SvgText
                 x={pt.x}
@@ -260,23 +250,29 @@ export function InsightsScreen({ setActiveTab }) {
                 fontSize={10}
                 textAnchor="middle"
               >
-                {pt.record.month}
+                {pt.record.month ?? ''}
               </SvgText>
             </G>
           ))}
         </Svg>
       </View>
     );
-  };
+  }, [history]);
 
-  // Category breakdown donut chart helper
-  const renderDonutChart = () => {
+  // Category breakdown donut chart helper wrapped in useMemo
+  const donutChartComponent = React.useMemo(() => {
+    const transportVal = percentages?.transport ?? 20;
+    const electricityVal = percentages?.electricity ?? 20;
+    const foodVal = percentages?.food ?? 20;
+    const wasteVal = percentages?.waste ?? 20;
+    const shoppingVal = percentages?.shopping ?? 20;
+
     const segments = [
-      { label: 'Transport', val: percentages.transport || 0, color: COLORS.primary },
-      { label: 'Electricity', val: percentages.electricity || 0, color: COLORS.secondary },
-      { label: 'Food', val: percentages.food || 0, color: COLORS.tertiary },
-      { label: 'Waste', val: percentages.waste || 0, color: COLORS.error },
-      { label: 'Shopping', val: percentages.shopping || 0, color: COLORS.outline },
+      { label: 'Transport', val: transportVal, color: COLORS.primary },
+      { label: 'Electricity', val: electricityVal, color: COLORS.secondary },
+      { label: 'Food', val: foodVal, color: COLORS.tertiary },
+      { label: 'Waste', val: wasteVal, color: COLORS.error },
+      { label: 'Shopping', val: shoppingVal, color: COLORS.outline },
     ].filter(s => s.val > 0);
 
     const size = 180;
@@ -285,14 +281,13 @@ export function InsightsScreen({ setActiveTab }) {
     const strokeWidth = 14;
     const C = 2 * Math.PI * radius; // ~376.99
 
-    let accumulatedOffset = 0;
+    let accumulatedOffsetValue = 0;
 
     return (
       <View style={styles.donutContainer}>
         <View style={styles.donutSvgWrapper}>
           <Svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
             <G transform={`rotate(-90 ${center} ${center})`}>
-              {/* Background circle */}
               <Circle
                 cx={center}
                 cy={center}
@@ -302,11 +297,10 @@ export function InsightsScreen({ setActiveTab }) {
                 strokeWidth={strokeWidth}
               />
               
-              {/* Segments */}
               {segments.map((seg, idx) => {
                 const strokeLength = (seg.val / 100) * C;
-                const strokeOffset = -accumulatedOffset;
-                accumulatedOffset += strokeLength;
+                const strokeOffset = -accumulatedOffsetValue;
+                accumulatedOffsetValue += strokeLength;
 
                 return (
                   <Circle
@@ -325,7 +319,6 @@ export function InsightsScreen({ setActiveTab }) {
               })}
             </G>
 
-            {/* Center Labels */}
             <SvgText
               x={center}
               y={center - 6}
@@ -345,12 +338,11 @@ export function InsightsScreen({ setActiveTab }) {
               fontWeight="800"
               textAnchor="middle"
             >
-              {Math.round(totalMonthly)} kg
+              {Math.round(totalMonthly ?? 0)} kg
             </SvgText>
           </Svg>
         </View>
 
-        {/* Legend Panel */}
         <View style={styles.donutLegend}>
           {segments.map((seg, idx) => (
             <View key={idx} style={styles.legendRow}>
@@ -364,7 +356,7 @@ export function InsightsScreen({ setActiveTab }) {
         </View>
       </View>
     );
-  };
+  }, [percentages, totalMonthly]);
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
@@ -399,28 +391,25 @@ export function InsightsScreen({ setActiveTab }) {
             <Text style={[styles.statValue, { color: COLORS.tertiary }]}>
               {complianceRateCount.toFixed(1)}%
             </Text>
-            <Text style={styles.statStatus}>Compliance Compliance ({complianceRate})</Text>
+            <Text style={styles.statStatus}>Compliance ({complianceRate})</Text>
           </GlassCard>
         </View>
 
         {/* Dynamic Charts Grid */}
         <View style={[styles.chartsContainer, isDesktop && styles.desktopChartsRow]}>
-          {/* Monthly Emissions Timeline - Line Chart simulation using custom bars */}
           <GlassCard style={[styles.chartCard, { flex: 1.2 }]}>
             <Text style={styles.sectionTitleInside}>Monthly Emissions Timeline (Jan - Jun)</Text>
-            {renderLineChart()}
+            {lineChartComponent}
           </GlassCard>
 
-          {/* Category Breakdown Donut chart representation */}
           <GlassCard style={[styles.chartCard, { flex: 0.8 }]}>
             <Text style={styles.sectionTitleInside}>Category Breakdown</Text>
-            {renderDonutChart()}
+            {donutChartComponent}
           </GlassCard>
         </View>
 
         {/* Goal Setting & Offset Grid */}
         <View style={[styles.chartsContainer, isDesktop && styles.desktopChartsRow]}>
-          {/* Goal Setting */}
           <GlassCard style={[styles.chartCard, { flex: 1 }]}>
             <View style={styles.sectionTitleRow}>
               <Text style={styles.sectionTitleInside}>Goal Setting</Text>
@@ -482,22 +471,27 @@ export function InsightsScreen({ setActiveTab }) {
             )}
 
             <View style={styles.goalsList}>
-              {goals.map((goal) => (
-                <View key={goal.id} style={styles.goalItem}>
-                  <View style={styles.goalInfoRow}>
-                    <Text style={styles.goalTitle}>{goal.title}</Text>
-                    <Text style={styles.goalTarget}>{goal.target}</Text>
+              {goals && goals.length > 0 ? (
+                goals.map((goal) => (
+                  <View key={goal.id || Math.random().toString()} style={styles.goalItem}>
+                    <View style={styles.goalInfoRow}>
+                      <Text style={styles.goalTitle}>{goal.title || 'Untitled Goal'}</Text>
+                      <Text style={styles.goalTarget}>{goal.target || 'No Target'}</Text>
+                    </View>
+                    <View style={styles.progressBarBg}>
+                      <View style={[styles.progressBarFill, { width: `${(goal.progress ?? 0) * 100}%`, backgroundColor: COLORS.secondary }]} />
+                    </View>
+                    <Text style={styles.goalProgressText}>{Math.round((goal.progress ?? 0) * 100)}% Complete</Text>
                   </View>
-                  <View style={styles.progressBarBg}>
-                    <View style={[styles.progressBarFill, { width: `${goal.progress * 100}%`, backgroundColor: COLORS.secondary }]} />
-                  </View>
-                  <Text style={styles.goalProgressText}>{Math.round(goal.progress * 100)}% Complete</Text>
-                </View>
-              ))}
+                ))
+              ) : (
+                <Text style={{ color: COLORS.onSurfaceVariant, fontSize: 13, textAlign: 'center', marginVertical: 12 }}>
+                  No active goals set yet.
+                </Text>
+              )}
             </View>
           </GlassCard>
 
-          {/* Offset Suggestions */}
           <GlassCard style={[styles.chartCard, { flex: 1 }]}>
             <Text style={styles.sectionTitleInside}>Offset Opportunities</Text>
             <View style={styles.offsetsList}>
@@ -561,15 +555,21 @@ export function InsightsScreen({ setActiveTab }) {
           </View>
           
           <View style={styles.aiRecsList}>
-            {recommendations.map((rec, i) => (
-              <View key={i} style={styles.aiRecRow}>
-                <MaterialIcons name={rec.icon || 'star'} size={24} color={rec.color || COLORS.primary} style={{ marginTop: 2 }} />
-                <View style={styles.aiRecTextCol}>
-                  <Text style={styles.aiRecTitle}>{rec.title}</Text>
-                  <Text style={styles.aiRecDesc}>{rec.desc}</Text>
+            {recommendations && recommendations.length > 0 ? (
+              recommendations.map((rec, i) => (
+                <View key={i} style={styles.aiRecRow}>
+                  <MaterialIcons name={rec.icon || 'star'} size={24} color={rec.color || COLORS.primary} style={{ marginTop: 2 }} />
+                  <View style={styles.aiRecTextCol}>
+                    <Text style={styles.aiRecTitle}>{rec.title || 'Tip'}</Text>
+                    <Text style={styles.aiRecDesc}>{rec.desc || ''}</Text>
+                  </View>
                 </View>
-              </View>
-            ))}
+              ))
+            ) : (
+              <Text style={{ color: COLORS.onSurfaceVariant, fontSize: 13, textAlign: 'center', marginVertical: 12 }}>
+                Tap "Ask AI Coach" to get personalized sustainability recommendations.
+              </Text>
+            )}
           </View>
         </GlassCard>
 

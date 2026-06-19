@@ -15,11 +15,11 @@ import { useResponsive } from '../hooks/useResponsive';
 import { GlassCard } from '../components/GlassCard';
 import { API_BASE, getHeaders } from '../config';
 
-export function MarketplaceScreen() {
+export function MarketplaceScreen({ setActiveTab, cachedProfile, setCachedProfile, setCachedLeaderboard }) {
   const { isDesktop } = useResponsive();
   const [offsets, setOffsets] = useState([
     { id: '1', title: 'Reforestation in Amazonia', category: 'Forestry', cost: 15, offset: '75 kg CO₂/yr', icon: 'forest', rating: '4.8 (Gold Standard)', desc: 'Restores deforested areas of the Amazon basin to recover native biodiversity and trap carbon.' },
-    { id: '2', title: 'Solar Power Grid Expansion', category: 'Renewable', cost: 120, offset: '600 kg CO₂/yr', icon: 'wb-sunny', rating: '4.9 (VCS)', desc: 'Displaces fossil energy by supporting solar grid construction in high-pollution industrial regions.' },
+    { id: '2', title: 'Solar Power Grid Expansion', category: 'Renewable', cost: 120, offset: '600 kg CO₂/yr', icon: 'wb-sunny', rating: '4.9 (VCS)', desc: 'Displaces solar grid construction in high-pollution industrial regions.' },
     { id: '3', title: 'Wind Infrastructure development', category: 'Renewable', cost: 250, offset: '1.2 Tons CO₂/yr', icon: 'air', rating: '4.7 (CDM)', desc: 'Finances wind turbine arrays on coastal plains to inject clean power directly into national grids.' },
     { id: '4', title: 'Coastal Mangrove Restoration', category: 'Blue Carbon', cost: 35, offset: '180 kg CO₂/yr', icon: 'water', rating: '4.9 (Plan Vivo)', desc: 'Protects marine coastlines while sequestering carbon up to 10x faster than terrestrial forests.' },
   ]);
@@ -30,15 +30,19 @@ export function MarketplaceScreen() {
   const [selectedOffset, setSelectedOffset] = useState(null);
 
   // Load backend offset data if any
-  const loadPortfolio = () => {
-    fetch(`${API_BASE}/profile`, { headers: getHeaders() })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data && !data.error) {
-          // Can sync points or load custom offsets purchased
-        }
-      })
-      .catch((err) => console.log('Error loading profile in marketplace:', err));
+  const loadPortfolio = (forceRefresh = false) => {
+    if (cachedProfile && !forceRefresh) {
+      // Can sync points or load custom offsets purchased
+    } else {
+      fetch(`${API_BASE}/profile`, { headers: getHeaders() })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data && !data.error) {
+            if (setCachedProfile) setCachedProfile(data);
+          }
+        })
+        .catch((err) => console.log('Error loading profile in marketplace:', err));
+    }
   };
 
   useEffect(() => {
@@ -57,6 +61,14 @@ export function MarketplaceScreen() {
           setSelectedOffset(offset);
           setPointsRewarded(data.pointsReward);
           setSuccessModalVisible(true);
+          
+          if (setCachedProfile && data.profile) {
+            setCachedProfile(data.profile);
+          }
+          if (setCachedLeaderboard) {
+            setCachedLeaderboard(null); // invalidate leaderboard cache
+          }
+
           // Update portfolio locally
           setPortfolio((prev) => {
             const existing = prev.find(p => p.id === offset.id);
@@ -66,7 +78,7 @@ export function MarketplaceScreen() {
               return [...prev, { ...offset, count: 1 }];
             }
           });
-          loadPortfolio();
+          loadPortfolio(true);
         }
       })
       .catch((err) => {

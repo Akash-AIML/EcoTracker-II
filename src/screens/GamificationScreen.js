@@ -16,7 +16,7 @@ import { useResponsive } from '../hooks/useResponsive';
 import { GlassCard } from '../components/GlassCard';
 import { API_BASE, getHeaders, getUserId, setUserId } from '../config';
 
-export function GamificationScreen() {
+export function GamificationScreen({ setActiveTab, cachedProfile, setCachedProfile, cachedLeaderboard, setCachedLeaderboard }) {
   const { isDesktop } = useResponsive();
 
   const currentUserId = getUserId();
@@ -100,26 +100,40 @@ export function GamificationScreen() {
   const challengeAnim = useRef(new Animated.Value(0)).current;
 
   // Load backend datasets
-  const loadData = () => {
+  const loadData = (forceRefresh = false) => {
     // 1. Fetch Profile
-    fetch(`${API_BASE}/profile`, { headers: getHeaders() })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data && !data.error) {
-          setProfile(data);
-          // Sync achievements active states
-          setAchievements((prev) =>
-            prev.map((item) => ({
-              ...item,
-              active: data.badges.includes(item.name),
-              color: data.badges.includes(item.name)
-                ? (item.name === 'Tree Planter' ? COLORS.primary : item.name === 'Carbon Ninja' ? COLORS.secondary : COLORS.tertiary)
-                : COLORS.onSurfaceVariant,
-            }))
-          );
-        }
-      })
-      .catch((err) => console.log('Error loading profile:', err));
+    if (cachedProfile && !forceRefresh) {
+      setProfile(cachedProfile);
+      setAchievements((prev) =>
+        prev.map((item) => ({
+          ...item,
+          active: cachedProfile.badges ? cachedProfile.badges.includes(item.name) : false,
+          color: cachedProfile.badges && cachedProfile.badges.includes(item.name)
+            ? (item.name === 'Tree Planter' ? COLORS.primary : item.name === 'Carbon Ninja' ? COLORS.secondary : COLORS.tertiary)
+            : COLORS.onSurfaceVariant,
+        }))
+      );
+    } else {
+      fetch(`${API_BASE}/profile`, { headers: getHeaders() })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data && !data.error) {
+            setProfile(data);
+            if (setCachedProfile) setCachedProfile(data);
+            // Sync achievements active states
+            setAchievements((prev) =>
+              prev.map((item) => ({
+                ...item,
+                active: data.badges ? data.badges.includes(item.name) : false,
+                color: data.badges && data.badges.includes(item.name)
+                  ? (item.name === 'Tree Planter' ? COLORS.primary : item.name === 'Carbon Ninja' ? COLORS.secondary : COLORS.tertiary)
+                  : COLORS.onSurfaceVariant,
+              }))
+            );
+          }
+        })
+        .catch((err) => console.log('Error loading profile:', err));
+    }
 
     // 2. Fetch Challenges
     fetch(`${API_BASE}/challenges`, { headers: getHeaders() })
@@ -130,23 +144,36 @@ export function GamificationScreen() {
       .catch((err) => console.log('Error loading challenges:', err));
 
     // 3. Fetch Leaderboards
-    fetch(`${API_BASE}/leaderboard`, { headers: getHeaders() })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data && !data.error) {
-          setLeaderboard(data);
-          // Animate entry
-          const timings = leaderboardAnims.map((anim) =>
-            Animated.timing(anim, {
-              toValue: 1,
-              duration: 500,
-              useNativeDriver: true,
-            })
-          );
-          Animated.stagger(120, timings).start();
-        }
-      })
-      .catch((err) => console.log('Error loading leaderboard:', err));
+    if (cachedLeaderboard && !forceRefresh) {
+      setLeaderboard(cachedLeaderboard);
+      const timings = leaderboardAnims.map((anim) =>
+        Animated.timing(anim, {
+          toValue: 1,
+          duration: 500,
+          useNativeDriver: true,
+        })
+      );
+      Animated.stagger(120, timings).start();
+    } else {
+      fetch(`${API_BASE}/leaderboard`, { headers: getHeaders() })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data && !data.error) {
+            setLeaderboard(data);
+            if (setCachedLeaderboard) setCachedLeaderboard(data);
+            // Animate entry
+            const timings = leaderboardAnims.map((anim) =>
+              Animated.timing(anim, {
+                toValue: 1,
+                duration: 500,
+                useNativeDriver: true,
+              })
+            );
+            Animated.stagger(120, timings).start();
+          }
+        })
+        .catch((err) => console.log('Error loading leaderboard:', err));
+    }
   };
 
   useEffect(() => {
@@ -179,8 +206,8 @@ export function GamificationScreen() {
       .then((res) => res.json())
       .then((data) => {
         if (data && data.success) {
-          // Refresh statistics
-          loadData();
+          // Refresh statistics and force cache refresh
+          loadData(true);
         }
       })
       .catch((err) => console.log('Error modifying challenge progress:', err));

@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, SafeAreaView, Platform } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { COLORS } from './src/theme/theme';
 import { useResponsive } from './src/hooks/useResponsive';
 import { TopNavBar } from './src/components/TopNavBar';
 import { BottomTabBar } from './src/components/BottomTabBar';
-import { getUserId } from './src/config';
+import { getUserId, API_BASE, getHeaders } from './src/config';
 
 // Import Screens
 import { AuthScreen } from './src/screens/AuthScreen';
@@ -21,6 +21,36 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('home'); // home, calculate, analytics, projects, marketplace, impact
 
   const currentUserId = getUserId();
+
+  const [cachedProfile, setCachedProfile] = useState(null);
+  const [cachedConfig, setCachedConfig] = useState(null);
+  const [cachedLeaderboard, setCachedLeaderboard] = useState(null);
+
+  // Preload and cache profile, config, and leaderboard on startup / user changes
+  useEffect(() => {
+    if (currentUserId) {
+      fetch(`${API_BASE}/config`, { headers: getHeaders() })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data && !data.error) setCachedConfig(data);
+        })
+        .catch((err) => console.log('Error caching config:', err));
+
+      fetch(`${API_BASE}/profile`, { headers: getHeaders() })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data && !data.error) setCachedProfile(data);
+        })
+        .catch((err) => console.log('Error caching profile:', err));
+
+      fetch(`${API_BASE}/leaderboard`, { headers: getHeaders() })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data && !data.error) setCachedLeaderboard(data);
+        })
+        .catch((err) => console.log('Error caching leaderboard:', err));
+    }
+  }, [currentUserId]);
 
   if (!currentUserId) {
     return (
@@ -40,15 +70,36 @@ export default function App() {
       case 'home':
         return <LandingPageScreen onStartCalculator={() => setActiveTab('calculate')} setActiveTab={setActiveTab} />;
       case 'calculate':
-        return <CarbonCalculatorScreen onBackHome={() => setActiveTab('home')} />;
+        return (
+          <CarbonCalculatorScreen
+            onBackHome={() => setActiveTab('home')}
+            setCachedProfile={setCachedProfile}
+            setCachedLeaderboard={setCachedLeaderboard}
+          />
+        );
       case 'analytics':
         return <InsightsScreen setActiveTab={setActiveTab} />;
       case 'projects':
         return <ProjectsScreen setActiveTab={setActiveTab} />;
       case 'marketplace':
-        return <MarketplaceScreen setActiveTab={setActiveTab} />;
+        return (
+          <MarketplaceScreen
+            setActiveTab={setActiveTab}
+            cachedProfile={cachedProfile}
+            setCachedProfile={setCachedProfile}
+            setCachedLeaderboard={setCachedLeaderboard}
+          />
+        );
       case 'impact':
-        return <GamificationScreen setActiveTab={setActiveTab} />;
+        return (
+          <GamificationScreen
+            setActiveTab={setActiveTab}
+            cachedProfile={cachedProfile}
+            setCachedProfile={setCachedProfile}
+            cachedLeaderboard={cachedLeaderboard}
+            setCachedLeaderboard={setCachedLeaderboard}
+          />
+        );
       default:
         return <LandingPageScreen onStartCalculator={() => setActiveTab('calculate')} setActiveTab={setActiveTab} />;
     }

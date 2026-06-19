@@ -15,7 +15,7 @@ import { useResponsive } from '../hooks/useResponsive';
 import { GlassCard } from '../components/GlassCard';
 import { API_BASE, getHeaders } from '../config';
 
-export function CarbonCalculatorScreen({ onBackHome }) {
+export function CarbonCalculatorScreen({ onBackHome, setCachedProfile, setCachedLeaderboard }) {
   const { isDesktop } = useResponsive();
 
   // Wizard Navigation
@@ -161,6 +161,14 @@ export function CarbonCalculatorScreen({ onBackHome }) {
       })
         .then((res) => res.json())
         .then((data) => {
+          if (data && data.success) {
+            if (setCachedProfile && data.profile) {
+              setCachedProfile(data.profile);
+            }
+            if (setCachedLeaderboard) {
+              setCachedLeaderboard(null);
+            }
+          }
           // Trigger dynamic AI Coach generation
           fetch(`${API_BASE}/ai/recommend`, {
             method: 'POST',
