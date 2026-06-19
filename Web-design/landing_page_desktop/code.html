@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>EcoTrack AI | Precision Sustainability</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary-container": "#e29100",
+                    "surface": "#0b1326",
+                    "on-secondary": "#00344d",
+                    "on-primary-fixed-variant": "#005236",
+                    "primary-fixed": "#6ffbbe",
+                    "on-surface": "#dae2fd",
+                    "surface-container-lowest": "#060e20",
+                    "on-tertiary-fixed-variant": "#653e00",
+                    "on-secondary-fixed": "#001e2f",
+                    "error-container": "#93000a",
+                    "background": "#0b1326",
+                    "surface-tint": "#4edea3",
+                    "outline": "#86948a",
+                    "primary-container": "#10b981",
+                    "outline-variant": "#3c4a42",
+                    "surface-dim": "#0b1326",
+                    "secondary-container": "#00a2e6",
+                    "surface-container-highest": "#2d3449",
+                    "tertiary-fixed": "#ffddb8",
+                    "surface-container-low": "#131b2e",
+                    "surface-container": "#171f33",
+                    "on-secondary-fixed-variant": "#004c6e",
+                    "on-background": "#dae2fd",
+                    "primary": "#4edea3",
+                    "inverse-surface": "#dae2fd",
+                    "secondary-fixed-dim": "#89ceff",
+                    "surface-container-high": "#222a3d",
+                    "on-error-container": "#ffdad6",
+                    "secondary-fixed": "#c9e6ff",
+                    "on-secondary-container": "#00344e",
+                    "on-primary-container": "#00422b",
+                    "on-primary": "#003824",
+                    "tertiary-fixed-dim": "#ffb95f",
+                    "on-surface-variant": "#bbcabf",
+                    "on-tertiary-container": "#523200",
+                    "primary-fixed-dim": "#4edea3",
+                    "on-tertiary": "#472a00",
+                    "secondary": "#89ceff",
+                    "on-error": "#690005",
+                    "inverse-primary": "#006c49",
+                    "on-tertiary-fixed": "#2a1700",
+                    "on-primary-fixed": "#002113",
+                    "inverse-on-surface": "#283044",
+                    "error": "#ffb4ab",
+                    "tertiary": "#ffb95f",
+                    "surface-bright": "#31394d",
+                    "surface-variant": "#2d3449"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "xl": "4rem",
+                    "unit": "4px",
+                    "gutter": "1.5rem",
+                    "margin": "2rem",
+                    "sm": "1rem",
+                    "xs": "0.5rem",
+                    "md": "1.5rem",
+                    "lg": "2.5rem"
+            },
+            "fontFamily": {
+                    "display-lg": ["Geist"],
+                    "label-md": ["Geist"],
+                    "headline-md": ["Geist"],
+                    "body-md": ["Geist"],
+                    "display-lg-mobile": ["Geist"],
+                    "caption": ["Geist"],
+                    "title-sm": ["Geist"]
+            },
+            "fontSize": {
+                    "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "label-md": ["14px", {"lineHeight": "1.2", "letterSpacing": "0.01em", "fontWeight": "500"}],
+                    "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "display-lg-mobile": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "caption": ["12px", {"lineHeight": "1.2", "fontWeight": "400"}],
+                    "title-sm": ["18px", {"lineHeight": "1.4", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #0b1326;
+            color: #dae2fd;
+            font-family: 'Geist', sans-serif;
+            overflow-x: hidden;
+        }
+        .glass-card {
+            background: rgba(30, 41, 59, 0.5);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: inset 0px 1px 0px 0px rgba(255, 255, 255, 0.05);
+        }
+        .vibrant-emerald-glow {
+            box-shadow: 0 0 15px rgba(78, 222, 163, 0.3);
+        }
+        .transition-slow {
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        @keyframes slow-rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .animate-slow-rotate {
+            animation: slow-rotate 120s linear infinite;
+        }
+        .emerald-gradient-text {
+            background: linear-gradient(135deg, #4edea3 0%, #89ceff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+<!-- TopNavBar -->
+<nav class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-gutter h-16 bg-surface/50 backdrop-blur-md border-b border-white/10 shadow-sm">
+<div class="flex items-center gap-md">
+<span class="font-display-lg text-display-lg font-bold text-primary tracking-tight">EcoTrack AI</span>
+<div class="hidden md:flex items-center gap-gutter ml-lg">
+<a class="text-primary border-b-2 border-primary pb-1 font-body-md text-body-md transition-colors" href="#">Dashboard</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md" href="#">Analytics</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md" href="#">Projects</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md" href="#">Marketplace</a>
+</div>
+</div>
+<div class="flex items-center gap-sm">
+<div class="relative group cursor-pointer active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-on-surface-variant hover:text-primary">notifications</span>
+</div>
+<div class="relative group cursor-pointer active:scale-95 transition-transform ml-xs">
+<span class="material-symbols-outlined text-on-surface-variant hover:text-primary">settings</span>
+</div>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-primary/30 ml-sm cursor-pointer active:scale-95 transition-transform">
+<img alt="User profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuABbwKjMCtt2BIPzuY3HKRlGvLYpw0bYz6TOd7Fgb5wlf63ixv0-IvdSgVEb_IfLak8FGpkbmxVKGU8nZzutsiZ3Cgv27Z27iZ5lxgGGddbLZ6Sls52OtMW6nrVvIfNOyvpJpY2kJKuwG8oLHwbf6ESqzDFTWh6hDd_IWX-g43EHI9kHbTuTq1t2i0W_QYLBZ2ZiXCW3fskPXC5aYuEY0fUi_KpUOF52XvWRVnK1ytekhQsVSdrSgAVHabj7B0clky00xCcFyBb7FqV"/>
+</div>
+</div>
+</nav>
+<main class="flex-grow pt-16">
+<!-- Hero Section -->
+<section class="relative h-screen flex items-center justify-center overflow-hidden px-gutter">
+
+<div class="relative z-10 max-w-6xl w-full grid grid-cols-1 lg:grid-cols-2 gap-xl items-center">
+<div class="space-y-md text-center lg:text-left">
+<div class="inline-flex items-center px-sm py-xs rounded-full bg-primary/10 border border-primary/20 backdrop-blur-md">
+<span class="material-symbols-outlined text-primary mr-xs text-sm" style="font-variation-settings: 'FILL' 1;">eco</span>
+<span class="font-label-md text-label-md text-primary uppercase tracking-widest">Next-Gen Carbon Intelligence</span>
+</div>
+<h1 class="font-display-lg text-display-lg text-on-surface leading-none">
+                        Track. Reduce. <br/>
+<span class="emerald-gradient-text">Restore.</span>
+</h1>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-lg mx-auto lg:mx-0">
+                        Harnessing the power of precision AI to quantify environmental impact in real-time. Join the global movement to engineer a carbon-negative future through data-driven clarity.
+                    </p>
+<div class="flex flex-col sm:flex-row gap-sm pt-md justify-center lg:justify-start">
+<button class="px-lg py-sm bg-primary text-on-primary font-title-sm text-title-sm rounded-lg vibrant-emerald-glow hover:scale-105 active:scale-95 transition-all">
+                            Start Your Journey
+                        </button>
+<button class="px-lg py-sm border border-primary/30 text-primary font-title-sm text-title-sm rounded-lg hover:bg-primary/10 transition-all flex items-center justify-center gap-xs">
+                            View Global Map <span class="material-symbols-outlined">north_east</span>
+</button>
+</div>
+</div>
+<div class="relative hidden lg:flex justify-center items-center h-[500px]">
+<!-- Floating Data Visualizations around a central globe glow -->
+<div class="absolute w-96 h-96 bg-primary/20 blur-[100px] rounded-full animate-pulse"></div>
+<div class="relative z-20 w-80 h-80 rounded-full glass-card border-primary/20 flex items-center justify-center overflow-hidden">
+
+</div>
+<!-- Stats Overlays -->
+<div class="absolute top-0 right-0 glass-card p-sm rounded-xl border-secondary/20 -translate-y-1/4 animate-bounce-slow">
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-secondary">trending_down</span>
+<div>
+<p class="text-[10px] uppercase tracking-tighter opacity-70">Live Reduction</p>
+<p class="font-headline-md text-headline-md text-secondary">-14.2%</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Stats Ticker -->
+<section class="py-md border-y border-white/5 bg-surface-container-lowest/50 backdrop-blur-sm">
+<div class="max-w-7xl mx-auto px-gutter grid grid-cols-2 md:grid-cols-4 gap-lg text-center">
+<div>
+<p class="font-label-md text-label-md text-on-surface-variant uppercase">Global Carbon Saved</p>
+<p class="font-headline-md text-headline-md text-primary mt-xs">2.4M Tons</p>
+</div>
+<div>
+<p class="font-label-md text-label-md text-on-surface-variant uppercase">Active Projects</p>
+<p class="font-headline-md text-headline-md text-primary mt-xs">1,842</p>
+</div>
+<div>
+<p class="font-label-md text-label-md text-on-surface-variant uppercase">Trees Restored</p>
+<p class="font-headline-md text-headline-md text-primary mt-xs">840K+</p>
+</div>
+<div>
+<p class="font-label-md text-label-md text-on-surface-variant uppercase">AI Precision</p>
+<p class="font-headline-md text-headline-md text-primary mt-xs">99.9%</p>
+</div>
+</div>
+</section>
+<!-- Bento Grid Features -->
+<section class="py-xl px-gutter max-w-7xl mx-auto">
+<div class="text-center mb-xl">
+<h2 class="font-display-lg text-display-lg-mobile md:text-display-lg text-on-surface mb-xs">Data-Driven Restoration</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Our intelligence layer integrates seamlessly with your supply chain to find every carbon leak.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-12 gap-gutter">
+<!-- Large Feature -->
+<div class="md:col-span-7 glass-card rounded-2xl p-lg flex flex-col justify-between min-h-[400px] group transition-slow hover:border-primary/40">
+<div class="space-y-sm">
+<div class="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">analytics</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface">Predictive Emissions Analytics</h3>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-md">Utilize machine learning to forecast carbon output before it happens. Our algorithms identify inefficiencies and suggest remediation strategies automatically.</p>
+</div>
+<div class="mt-lg rounded-xl overflow-hidden h-48 border border-white/5">
+<img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="A high-fidelity digital dashboard showing complex data visualizations and carbon footprint analytics. The UI is sleek and dark with neon emerald and sky blue graph lines glowing against a deep slate background. The image evokes a sense of high-tech precision and environmental control." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAGLdYgb5qyoz6Nn-yVGKHN6LQoUrIbv-y3RzEerDMKGJOFdUL76Hnd7e1lMrp6FJHNqNri71zlBNnZGD9s8p5rXwKxOBJ-hGSdXIFD9UyXBRtdQXmoli7pcGWzFs1L08iQmQD5Q0QpShzEUyNLLcs1YM4mD1jrgoyKfpJbEUWE-niSyEel_c3xbnxpQEDSg3ucxlH_pzqYLZia7Vyc-8wiDdt72GMRZe0v0-Qg6Ai8vDSmqNXoHyj4PpoSWrQauu5jcvCao-fz2YZb"/>
+</div>
+</div>
+<!-- Vertical Feature -->
+<div class="md:col-span-5 glass-card rounded-2xl p-lg flex flex-col group transition-slow hover:border-secondary/40">
+<div class="w-12 h-12 bg-secondary/10 rounded-lg flex items-center justify-center mb-sm">
+<span class="material-symbols-outlined text-secondary">public</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface">Satellite Integration</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mt-sm">Real-time terrestrial monitoring via high-resolution satellite arrays to verify restoration projects with zero physical footprint.</p>
+<div class="mt-auto pt-lg">
+<div class="w-full h-64 rounded-xl overflow-hidden border border-white/5">
+<img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="A cinematic view of the earth from orbit, showing lush green continents and deep blue oceans under a thin atmosphere. High-tech digital data overlays and scanning grids trace across the surface, highlighting environmental restoration zones in glowing green. The style is hyper-realistic and futuristic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAwZnH8mSyWHbzsZFegkoS8ETJMHilmZRdk9UaRSZfC-LpscTz1az4Pc0iqxCbRtQezcalRHqBkByY6ONLvvTY8H8NJOS7nkH-31XaipdatDN-c5447NZnRRsskco49JUN230edLfDzcyDVKes-YqxSVOUk4VqbPHbT6A8IuDlK3jbzHHfVa173yTfbiCz5P4bfHPxiA2YusVDTyUWw9b_Cb5QbD9f4QSQVEIL7ryzMIsyZ8UXgzEbu9tgt8yY01l3gHqDebnqjeHrK"/>
+</div>
+</div>
+</div>
+<!-- Square Feature 1 -->
+<div class="md:col-span-4 glass-card rounded-2xl p-lg group transition-slow hover:border-tertiary/40">
+<span class="material-symbols-outlined text-tertiary text-4xl mb-sm" style="font-variation-settings: 'FILL' 1;">api</span>
+<h4 class="font-title-sm text-title-sm text-on-surface">Seamless API Connect</h4>
+<p class="font-caption text-caption text-on-surface-variant mt-xs">Integrate with 200+ ERP systems in minutes to begin ingestion of raw data streams.</p>
+</div>
+<!-- Square Feature 2 -->
+<div class="md:col-span-4 glass-card rounded-2xl p-lg group transition-slow hover:border-primary/40">
+<span class="material-symbols-outlined text-primary text-4xl mb-sm">verified_user</span>
+<h4 class="font-title-sm text-title-sm text-on-surface">Immutable Ledger</h4>
+<p class="font-caption text-caption text-on-surface-variant mt-xs">All reductions are verified on a private green-blockchain for audit-proof ESG reporting.</p>
+</div>
+<!-- Square Feature 3 -->
+<div class="md:col-span-4 glass-card rounded-2xl p-lg group transition-slow hover:border-secondary/40">
+<span class="material-symbols-outlined text-secondary text-4xl mb-sm">bolt</span>
+<h4 class="font-title-sm text-title-sm text-on-surface">Real-time Offsets</h4>
+<p class="font-caption text-caption text-on-surface-variant mt-xs">Auto-allocate funds to high-impact reforestation the moment emissions are tracked.</p>
+</div>
+</div>
+</section>
+<!-- CTA Section -->
+<section class="py-xl px-gutter relative overflow-hidden">
+<div class="absolute inset-0 bg-primary/5 -skew-y-3 origin-right"></div>
+<div class="max-w-4xl mx-auto relative z-10 glass-card rounded-3xl p-xl border-primary/20 text-center space-y-md">
+<h2 class="font-display-lg text-display-lg-mobile md:text-display-lg text-on-surface">Ready to lead the <span class="text-primary">Green Revolution</span>?</h2>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-2xl mx-auto">
+                    Join the 1,500+ enterprises using EcoTrack AI to reach Net Zero ahead of schedule. Your transformation begins with a single data point.
+                </p>
+<div class="pt-sm">
+<button class="px-xl py-md bg-primary text-on-primary font-headline-md text-headline-md rounded-xl shadow-lg vibrant-emerald-glow hover:translate-y-[-4px] active:scale-95 transition-all">
+                        Schedule a Demo
+                    </button>
+<p class="text-on-surface-variant font-caption text-caption mt-sm">No credit card required. Onboard in under 24 hours.</p>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="w-full py-md px-gutter flex flex-col md:flex-row justify-between items-center mt-auto bg-surface-container-lowest border-t border-white/10">
+<div class="flex flex-col items-center md:items-start gap-xs mb-md md:mb-0">
+<span class="font-title-sm text-title-sm text-on-surface">EcoTrack AI</span>
+<p class="font-caption text-caption text-secondary">© 2024 EcoTrack AI. Engineering a Sustainable Future.</p>
+</div>
+<div class="flex flex-wrap justify-center gap-md">
+<a class="font-caption text-caption text-on-surface-variant hover:text-secondary underline transition-all" href="#">Privacy Policy</a>
+<a class="font-caption text-caption text-on-surface-variant hover:text-secondary underline transition-all" href="#">Terms of Service</a>
+<a class="font-caption text-caption text-on-surface-variant hover:text-secondary underline transition-all" href="#">Carbon Methodology</a>
+<a class="font-caption text-caption text-on-surface-variant hover:text-secondary underline transition-all" href="#">API Docs</a>
+</div>
+</footer>
+<script>
+        // Micro-interactions and subtle effects
+        document.addEventListener('mousemove', (e) => {
+            const cards = document.querySelectorAll('.glass-card');
+            const x = e.clientX;
+            const y = e.clientY;
+
+            cards.forEach(card => {
+                const rect = card.getBoundingClientRect();
+                const cardX = x - rect.left;
+                const cardY = y - rect.top;
+                
+                // Only update if mouse is relatively near
+                if (cardX > -100 && cardX < rect.width + 100 && cardY > -100 && cardY < rect.height + 100) {
+                    card.style.setProperty('--mouse-x', `${cardX}px`);
+                    card.style.setProperty('--mouse-y', `${cardY}px`);
+                }
+            });
+        });
+
+        // Simple intersection observer for entry animations
+        const observerOptions = {
+            threshold: 0.1
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('opacity-100', 'translate-y-0');
+                    entry.target.classList.remove('opacity-0', 'translate-y-10');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.glass-card').forEach(el => {
+            el.classList.add('opacity-0', 'translate-y-10', 'transition-all', 'duration-1000');
+            observer.observe(el);
+        });
+    </script>
+</body></html>

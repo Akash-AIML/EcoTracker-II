@@ -1,0 +1,10 @@
+# This is a Node.js (JavaScript) backend service.
+# Node.js backend dependencies are defined and installed using "backend/package.json".
+# To deploy this service in Hugging Face (HF) Spaces, use a "Docker" space template 
+# which will automatically build and run the backend using the provided "backend/Dockerfile".
+
+# Listed below are the Node.js backend requirements:
+cors==2.8.5
+express==4.21.2
+firebase-admin==14.0.0
+morgan==1.10.0

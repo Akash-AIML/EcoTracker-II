@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<title>EcoTrack AI - Carbon Calculator</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        @import url('https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap');
+        
+        body {
+            font-family: 'Geist', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.5);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
+        }
+
+        .active-glow {
+            box-shadow: 0 0 15px rgba(78, 222, 163, 0.3);
+            border-color: #4edea3 !important;
+        }
+
+        .bioluminescent-btn {
+            box-shadow: 0 4px 14px 0 rgba(78, 222, 163, 0.3);
+        }
+
+        .custom-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            background: #4edea3;
+            cursor: pointer;
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(78, 222, 163, 0.5);
+        }
+
+        .step-indicator-active {
+            width: 2rem;
+            background: #4edea3;
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container-lowest": "#060e20",
+                    "inverse-surface": "#dae2fd",
+                    "on-error-container": "#ffdad6",
+                    "primary": "#4edea3",
+                    "on-primary-container": "#00422b",
+                    "surface": "#0b1326",
+                    "surface-container-highest": "#2d3449",
+                    "on-tertiary-container": "#523200",
+                    "surface-container": "#171f33",
+                    "on-surface": "#dae2fd",
+                    "outline-variant": "#3c4a42",
+                    "surface-variant": "#2d3449",
+                    "on-tertiary-fixed": "#2a1700",
+                    "on-tertiary-fixed-variant": "#653e00",
+                    "primary-fixed": "#6ffbbe",
+                    "on-secondary-container": "#00344e",
+                    "inverse-on-surface": "#283044",
+                    "tertiary-container": "#e29100",
+                    "tertiary": "#ffb95f",
+                    "surface-bright": "#31394d",
+                    "on-secondary-fixed-variant": "#004c6e",
+                    "error-container": "#93000a",
+                    "inverse-primary": "#006c49",
+                    "on-secondary": "#00344d",
+                    "on-primary": "#003824",
+                    "background": "#0b1326",
+                    "error": "#ffb4ab",
+                    "primary-fixed-dim": "#4edea3",
+                    "on-primary-fixed": "#002113",
+                    "on-tertiary": "#472a00",
+                    "secondary-fixed-dim": "#89ceff",
+                    "outline": "#86948a",
+                    "primary-container": "#10b981",
+                    "surface-tint": "#4edea3",
+                    "surface-dim": "#0b1326",
+                    "on-error": "#690005",
+                    "secondary-fixed": "#c9e6ff",
+                    "surface-container-low": "#131b2e",
+                    "on-secondary-fixed": "#001e2f",
+                    "on-surface-variant": "#bbcabf",
+                    "tertiary-fixed-dim": "#ffb95f",
+                    "secondary": "#89ceff",
+                    "tertiary-fixed": "#ffddb8",
+                    "surface-container-high": "#222a3d",
+                    "secondary-container": "#00a2e6",
+                    "on-primary-fixed-variant": "#005236",
+                    "on-background": "#dae2fd"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "md": "1.5rem",
+                    "unit": "4px",
+                    "xs": "0.5rem",
+                    "xl": "4rem",
+                    "margin": "2rem",
+                    "sm": "1rem",
+                    "gutter": "1.5rem",
+                    "lg": "2.5rem"
+            },
+            "fontFamily": {
+                    "caption": ["Geist"],
+                    "title-sm": ["Geist"],
+                    "display-lg": ["Geist"],
+                    "display-lg-mobile": ["Geist"],
+                    "headline-md": ["Geist"],
+                    "body-md": ["Geist"],
+                    "label-md": ["Geist"]
+            },
+            "fontSize": {
+                    "caption": ["12px", {"lineHeight": "1.2", "fontWeight": "400"}],
+                    "title-sm": ["18px", {"lineHeight": "1.4", "fontWeight": "600"}],
+                    "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "display-lg-mobile": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "label-md": ["14px", {"lineHeight": "1.2", "letterSpacing": "0.01em", "fontWeight": "500"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-surface text-on-surface min-h-screen selection:bg-primary/30">
+<!-- Top App Bar -->
+<header class="fixed top-0 w-full z-50 bg-surface/50 dark:bg-surface-container/50 backdrop-blur-xl border-b border-white/10 dark:border-white/5 shadow-sm backdrop-saturate-150">
+<div class="flex justify-between items-center px-margin h-16 w-full max-w-7xl mx-auto">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-primary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary-container" style="font-variation-settings: 'FILL' 1;">eco</span>
+</div>
+<h1 class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed tracking-tight">EcoTrack AI</h1>
+</div>
+<div class="flex items-center gap-2">
+<button class="p-2 rounded-full hover:bg-white/10 transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant">notifications</span>
+</button>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-primary/20">
+<img alt="User Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAfbSvIgrFI6x0lhKY96zmb1J-w-37aVQ4Opk2XSRClQ1YuoU4F3toj_yXGDr_W41cVRtRCmrJR0nZo_QkcRcc66tZWU7QESsDjZZe93gMSl-X-Wu9fhiwYenNusSXUGy2RZ4JxIm1u62BwcA7brNAeE8zPtcfmIPmGAKKnmxCKmxGCRxB24C0aey6PWi51LvyE3i1FspwQqPH52nZVA1Z3yn13mpWGbVpwArBWa76MvPjkXSdbJEUslRgH6vlUNX3INq4IumEAUesq"/>
+</div>
+</div>
+</div>
+</header>
+<main class="pt-24 pb-48 px-margin max-w-lg mx-auto relative z-10">
+<!-- Wizard Header -->
+<div class="mb-lg">
+<div class="flex items-center justify-between mb-xs">
+<span class="font-label-md text-label-md text-primary uppercase tracking-widest">Step 02 of 05</span>
+<span class="font-label-md text-label-md text-on-surface-variant">Transportation</span>
+</div>
+<div class="flex gap-2 h-1 w-full bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-primary/40 w-1/5 rounded-full"></div>
+<div class="h-full bg-primary w-1/5 rounded-full shadow-[0_0_8px_rgba(78,222,163,0.5)]"></div>
+<div class="h-full bg-surface-container w-1/5 rounded-full"></div>
+<div class="h-full bg-surface-container w-1/5 rounded-full"></div>
+<div class="h-full bg-surface-container w-1/5 rounded-full"></div>
+</div>
+</div>
+<!-- Animation/Atmosphere -->
+<div class="absolute inset-0 -z-10 opacity-30 pointer-events-none">
+
+</div>
+<div class="space-y-lg">
+<!-- Transport Type Selection -->
+<section>
+<h2 class="font-title-sm text-title-sm mb-md flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">directions_car</span>
+                    How do you get around?
+                </h2>
+<div class="grid grid-cols-4 gap-3">
+<button class="glass-panel active-glow flex flex-col items-center justify-center p-md rounded-xl transition-all hover:bg-white/5 active:scale-95 group" id="btn-car" onclick="selectTransport('car')">
+<span class="material-symbols-outlined text-primary mb-xs" data-icon="directions_car">directions_car</span>
+<span class="font-caption text-caption text-on-surface-variant group-hover:text-primary transition-colors">Car</span>
+</button>
+<button class="glass-panel flex flex-col items-center justify-center p-md rounded-xl transition-all hover:bg-white/5 active:scale-95 group" id="btn-bus" onclick="selectTransport('bus')">
+<span class="material-symbols-outlined text-on-surface-variant mb-xs" data-icon="directions_bus">directions_bus</span>
+<span class="font-caption text-caption text-on-surface-variant group-hover:text-primary transition-colors">Bus</span>
+</button>
+<button class="glass-panel flex flex-col items-center justify-center p-md rounded-xl transition-all hover:bg-white/5 active:scale-95 group" id="btn-bike" onclick="selectTransport('bike')">
+<span class="material-symbols-outlined text-on-surface-variant mb-xs" data-icon="directions_bike">directions_bike</span>
+<span class="font-caption text-caption text-on-surface-variant group-hover:text-primary transition-colors">Bike</span>
+</button>
+<button class="glass-panel flex flex-col items-center justify-center p-md rounded-xl transition-all hover:bg-white/5 active:scale-95 group" id="btn-walk" onclick="selectTransport('walk')">
+<span class="material-symbols-outlined text-on-surface-variant mb-xs" data-icon="directions_walk">directions_walk</span>
+<span class="font-caption text-caption text-on-surface-variant group-hover:text-primary transition-colors">Walk</span>
+</button>
+</div>
+</section>
+<!-- Commute Distance -->
+<section class="glass-panel p-md rounded-2xl">
+<div class="flex justify-between items-center mb-md">
+<h2 class="font-title-sm text-title-sm flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">distance</span>
+                        Daily commute distance
+                    </h2>
+<span class="text-primary font-headline-md font-bold" id="distance-val">15<span class="text-label-md font-normal text-on-surface-variant ml-1">km</span></span>
+</div>
+<input class="w-full h-1.5 bg-surface-container-highest rounded-lg appearance-none cursor-pointer custom-slider" id="distance-slider" max="100" min="0" oninput="updateDistance(this.value)" step="1" type="range" value="15"/>
+<div class="flex justify-between mt-xs px-1">
+<span class="font-caption text-caption text-on-surface-variant">0km</span>
+<span class="font-caption text-caption text-on-surface-variant">100km+</span>
+</div>
+</section>
+<!-- Fuel Type Selection -->
+<section>
+<h2 class="font-title-sm text-title-sm mb-md flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">ev_station</span>
+                    Vehicle fuel type
+                </h2>
+<div class="relative group">
+<select class="w-full bg-surface-container-low border border-white/10 rounded-xl px-md py-4 font-body-md text-on-surface appearance-none focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all">
+<option value="electric">Electric (EV)</option>
+<option value="hybrid">Hybrid</option>
+<option selected="" value="gasoline">Gasoline</option>
+<option value="diesel">Diesel</option>
+<option value="lpg">LPG / Compressed Natural Gas</option>
+</select>
+<div class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant">
+<span class="material-symbols-outlined">expand_more</span>
+</div>
+</div>
+<p class="mt-xs font-caption text-caption text-on-surface-variant/70 flex items-center gap-1 px-1">
+<span class="material-symbols-outlined text-[14px]">info</span>
+                    Fuel type significantly impacts the final emission estimate.
+                </p>
+</section>
+</div>
+</main>
+<!-- Live Estimate Bottom Sheet -->
+<div class="fixed bottom-0 left-0 w-full z-40 bg-surface/70 dark:bg-surface-container-low/70 backdrop-blur-lg border-t border-white/10 dark:border-white/5 shadow-[0_-4px_20px_rgba(0,0,0,0.1)] rounded-t-xl px-4 pb-safe pt-4">
+<div class="max-w-7xl mx-auto">
+<!-- Glow Counter -->
+<div class="flex items-center justify-between mb-md glass-panel p-md rounded-xl border-primary/20">
+<div>
+<p class="font-label-md text-label-md text-on-surface-variant">Estimated Daily Impact</p>
+<div class="flex items-baseline gap-2">
+<span class="text-primary font-display-lg-mobile font-bold tracking-tight drop-shadow-[0_0_12px_rgba(78,222,163,0.4)]" id="live-carbon">2.4</span>
+<span class="text-on-surface font-headline-md font-medium">kg CO2e</span>
+</div>
+</div>
+<div class="h-12 w-12 rounded-full border-2 border-primary/20 flex items-center justify-center relative">
+<div class="absolute inset-0 rounded-full border-2 border-primary border-t-transparent animate-spin duration-700"></div>
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">analytics</span>
+</div>
+</div>
+<!-- Footer Navigation -->
+<div class="flex gap-4 pb-4">
+<button class="flex-1 py-4 px-md rounded-xl font-label-md text-label-md font-bold text-on-surface-variant bg-surface-container hover:bg-surface-container-highest transition-all active:scale-95">
+                    BACK
+                </button>
+<button class="flex-[2] py-4 px-md rounded-xl font-label-md text-label-md font-bold text-on-primary bg-primary bioluminescent-btn hover:brightness-110 transition-all active:scale-95 flex items-center justify-center gap-2">
+                    NEXT STEP
+                    <span class="material-symbols-outlined text-[20px]">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Hidden Bottom Nav for top-level context checking -->
+<nav class="hidden md:flex fixed bottom-0 w-full z-50 rounded-t-xl bg-surface/70 dark:bg-surface-container-low/70 backdrop-blur-lg border-t border-white/10 dark:border-white/5 shadow-[0_-4px_20px_rgba(0,0,0,0.1)] justify-around items-center px-4 pb-safe pt-2">
+<!-- Suppression logic active: Navigation hidden on task-focused wizard screen -->
+</nav>
+<script>
+        let currentDistance = 15;
+        let transportFactor = 0.16; // kg CO2 per km for car
+
+        function updateDistance(val) {
+            currentDistance = val;
+            document.getElementById('distance-val').innerHTML = `${val}<span class="text-label-md font-normal text-on-surface-variant ml-1">km</span>`;
+            calculateLiveEstimate();
+        }
+
+        function selectTransport(type) {
+            // Reset all buttons
+            const buttons = ['car', 'bus', 'bike', 'walk'];
+            buttons.forEach(t => {
+                const btn = document.getElementById(`btn-${t}`);
+                btn.classList.remove('active-glow');
+                btn.querySelector('.material-symbols-outlined').classList.remove('text-primary');
+                btn.querySelector('.material-symbols-outlined').classList.add('text-on-surface-variant');
+            });
+
+            // Set active
+            const activeBtn = document.getElementById(`btn-${type}`);
+            activeBtn.classList.add('active-glow');
+            activeBtn.querySelector('.material-symbols-outlined').classList.add('text-primary');
+            activeBtn.querySelector('.material-symbols-outlined').classList.remove('text-on-surface-variant');
+
+            // Update factors
+            switch(type) {
+                case 'car': transportFactor = 0.16; break;
+                case 'bus': transportFactor = 0.08; break;
+                case 'bike': transportFactor = 0.005; break;
+                case 'walk': transportFactor = 0; break;
+            }
+            calculateLiveEstimate();
+        }
+
+        function calculateLiveEstimate() {
+            const result = (currentDistance * transportFactor).toFixed(1);
+            const display = document.getElementById('live-carbon');
+            
+            // Minimal animation for value change
+            let startValue = parseFloat(display.innerText);
+            let endValue = parseFloat(result);
+            let duration = 300;
+            let startTime = null;
+
+            function animate(currentTime) {
+                if (!startTime) startTime = currentTime;
+                const progress = Math.min((currentTime - startTime) / duration, 1);
+                const current = (startValue + (endValue - startValue) * progress).toFixed(1);
+                display.innerText = current;
+                if (progress < 1) requestAnimationFrame(animate);
+            }
+            requestAnimationFrame(animate);
+        }
+
+        // Add a subtle parallax effect to the glass cards
+        document.addEventListener('mousemove', (e) => {
+            const amount = 5;
+            const x = (e.clientX / window.innerWidth - 0.5) * amount;
+            const y = (e.clientY / window.innerHeight - 0.5) * amount;
+            const glassCards = document.querySelectorAll('.glass-panel');
+            glassCards.forEach(card => {
+                card.style.transform = `perspective(1000px) rotateX(${-y}deg) rotateY(${x}deg)`;
+            });
+        });
+    </script>
+</body></html>
