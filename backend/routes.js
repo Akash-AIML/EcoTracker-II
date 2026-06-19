@@ -2,6 +2,35 @@ const express = require('express');
 const router = express.Router();
 const db = require('./firebase');
 
+// Simple in-memory cache for Firestore queries to optimize efficiency
+let usersCache = null;
+let usersCacheTime = 0;
+const CACHE_TTL = 10000; // 10 seconds
+
+async function getAllUsersCached() {
+  const now = Date.now();
+  if (usersCache && (now - usersCacheTime < CACHE_TTL)) {
+    return usersCache;
+  }
+  const snapshot = await db.collection('users').get();
+  usersCache = snapshot.docs.map(doc => {
+    const data = doc.data();
+    return {
+      id: doc.id,
+      name: data.name || doc.id,
+      email: data.email || '',
+      avatar: data.avatar || 'https://lh3.googleusercontent.com/aida-public/AB6AXuAT1EPgeHbiCyiDKLGp868IabVBLWQJe-FbA4S09aQJipuS6tXAJnHYJnoD4VL-TBLlnzm4xoCEkS_WlOmVhbeXjuNHry4GZPGKfJ5_iQ8X-fVs2ZENwqa0MK2sTi6dgD_hmctOs2tY1U0dbsRFDclOP1Sy81nI9zy56ULwxCR3EAsmngeA71gDstnUUoOs0PVxPurXRdI32iJ5ScLE0CjWgOYh6n808_7lSn7PlX4m0EkobLUHN1beT5h43E4UGhZjiUdK2JjYPK9R',
+      points: data.points || 0,
+      title: data.title || 'Eco Novice',
+      percentages: data.percentages || { transport: 20, electricity: 20, food: 20, waste: 20, shopping: 20 },
+      complianceRate: data.complianceRate || '80.0%',
+      totalMonthly: data.totalMonthly || 0
+    };
+  });
+  usersCacheTime = now;
+  return usersCache;
+}
+
 // ==========================================
 // Static Config Presets & Challenges Templates
 // ==========================================
@@ -102,18 +131,27 @@ router.get('/profile', async (req, res) => {
   }
 });
 
+let statsCache = null;
+let statsCacheTime = 0;
+
 // 3. Get global ticker statistics (landing page)
 router.get('/stats', async (req, res) => {
+  const now = Date.now();
+  if (statsCache && (now - statsCacheTime < 10000)) {
+    return res.json(statsCache);
+  }
   try {
-    const snapshot = await db.collection('users').get();
-    const userCount = snapshot.docs.length;
-    res.json({
+    const users = await getAllUsersCached();
+    const userCount = users.length;
+    statsCache = {
       globalReduction: '-14.2%',
       globalSavedTons: '12 Tons',
       activeProjectCount: `${Math.max(userCount * 12 + 50000, 50000).toLocaleString()}+`,
       treesRestoredCount: `${Math.max(userCount, 8000).toLocaleString()}+`,
       aiPrecision: '99.9%',
-    });
+    };
+    statsCacheTime = now;
+    res.json(statsCache);
   } catch (err) {
     res.json({
       globalReduction: '-14.2%',
@@ -149,6 +187,40 @@ router.get('/insights', async (req, res) => {
 // 4. Calculate Full-Spectrum Carbon Footprint
 router.post('/carbon/calculate', (req, res) => {
   const { transport, electricity, food, waste, shopping } = req.body;
+
+  // Validate transport inputs if provided
+  if (transport !== undefined) {
+    if (typeof transport !== 'object' || transport === null) {
+      return res.status(400).json({ error: 'Transport parameter must be an object' });
+    }
+    if (transport.distance !== undefined && (typeof transport.distance !== 'number' || transport.distance < 0 || isNaN(transport.distance))) {
+      return res.status(400).json({ error: 'Transport distance must be a valid positive number' });
+    }
+    if (transport.daysPerWeek !== undefined && (typeof transport.daysPerWeek !== 'number' || transport.daysPerWeek < 0 || transport.daysPerWeek > 7 || isNaN(transport.daysPerWeek))) {
+      return res.status(400).json({ error: 'Transport daysPerWeek must be a valid number between 0 and 7' });
+    }
+  }
+  // Validate electricity inputs if provided
+  if (electricity !== undefined) {
+    if (typeof electricity !== 'object' || electricity === null) {
+      return res.status(400).json({ error: 'Electricity parameter must be an object' });
+    }
+    if (electricity.units !== undefined && (typeof electricity.units !== 'number' || electricity.units < 0 || isNaN(electricity.units))) {
+      return res.status(400).json({ error: 'Electricity units must be a valid positive number' });
+    }
+  }
+  // Validate food inputs if provided
+  if (food !== undefined && (typeof food !== 'object' || food === null)) {
+    return res.status(400).json({ error: 'Food parameter must be an object' });
+  }
+  // Validate waste inputs if provided
+  if (waste !== undefined && (typeof waste !== 'object' || waste === null)) {
+    return res.status(400).json({ error: 'Waste parameter must be an object' });
+  }
+  // Validate shopping inputs if provided
+  if (shopping !== undefined && (typeof shopping !== 'object' || shopping === null)) {
+    return res.status(400).json({ error: 'Shopping parameter must be an object' });
+  }
 
   // Compute Transport
   const tMode = transport?.mode || 'car';
@@ -215,8 +287,11 @@ router.post('/footprint/save', async (req, res) => {
   const userId = getRequestUserId(req);
   const { monthlyEmission, breakdown } = req.body;
 
-  if (monthlyEmission === undefined) {
-    return res.status(400).json({ error: 'Missing monthlyEmission value' });
+  if (monthlyEmission === undefined || typeof monthlyEmission !== 'number' || monthlyEmission < 0 || isNaN(monthlyEmission)) {
+    return res.status(400).json({ error: 'monthlyEmission must be a valid positive number' });
+  }
+  if (breakdown !== undefined && (typeof breakdown !== 'object' || breakdown === null)) {
+    return res.status(400).json({ error: 'breakdown must be a valid object' });
   }
 
   try {
@@ -258,6 +333,7 @@ router.post('/footprint/save', async (req, res) => {
     };
 
     await db.collection('users').doc(userId).set(updatedProfile);
+    usersCache = null; // Invalidate cache
 
     // Fetch updated history list
     const snapshot = await db.collection('users').doc(userId).collection('history').get();
@@ -335,7 +411,19 @@ router.get('/goals', async (req, res) => {
 router.post('/goals', async (req, res) => {
   const userId = getRequestUserId(req);
   const { title, target } = req.body;
-  if (!title) return res.status(400).json({ error: 'Missing goal title' });
+  
+  if (!title || typeof title !== 'string' || !title.trim()) {
+    return res.status(400).json({ error: 'Goal title must be a valid non-empty string' });
+  }
+  if (title.length > 100) {
+    return res.status(400).json({ error: 'Goal title must be under 100 characters' });
+  }
+  if (target !== undefined && (typeof target !== 'string' || target.length > 50)) {
+    return res.status(400).json({ error: 'Goal target must be a valid string under 50 characters' });
+  }
+
+  const sanitizedTitle = title.replace(/<[^>]*>/g, '').trim();
+  const sanitizedTarget = (target || '').replace(/<[^>]*>/g, '').trim();
 
   try {
     const snapshot = await db.collection('users').doc(userId).collection('goals').get();
@@ -343,12 +431,13 @@ router.post('/goals', async (req, res) => {
 
     const newGoal = {
       id: newId,
-      title,
+      title: sanitizedTitle,
       progress: 0.0,
-      target: target || 'Active Target'
+      target: sanitizedTarget || 'Active Target'
     };
 
     await db.collection('users').doc(userId).collection('goals').doc(newId).set(newGoal);
+    usersCache = null; // Invalidate cache
 
     // Reward profile points
     const userDoc = await db.collection('users').doc(userId).get();
@@ -510,11 +599,15 @@ router.get('/challenges', async (req, res) => {
 router.post('/challenges/:id/join', async (req, res) => {
   const userId = getRequestUserId(req);
   const chId = req.params.id;
+  if (chId !== '1' && chId !== '2' && chId !== '3') {
+    return res.status(400).json({ error: 'Invalid challenge ID parameter' });
+  }
   try {
     await db.collection('users').doc(userId).collection('challenges').doc(chId).set({
       progress: 0.05,
       completed: false
     });
+    usersCache = null; // Invalidate cache
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -525,6 +618,9 @@ router.post('/challenges/:id/join', async (req, res) => {
 router.post('/challenges/:id/progress', async (req, res) => {
   const userId = getRequestUserId(req);
   const chId = req.params.id;
+  if (chId !== '1' && chId !== '2' && chId !== '3') {
+    return res.status(400).json({ error: 'Invalid challenge ID parameter' });
+  }
   
   try {
     const chDoc = await db.collection('users').doc(userId).collection('challenges').doc(chId).get();
@@ -560,6 +656,7 @@ router.post('/challenges/:id/progress', async (req, res) => {
     });
 
     const updatedPoints = (profile.points || 0) + pointsAwarded;
+    usersCache = null; // Invalidate cache
     const currentTitle = updatedPoints >= 12000 ? 'Master Guardian' : updatedPoints >= 11000 ? 'Nature Enthusiast' : 'Eco Novice';
     const updatedBadges = [...(profile.badges || [])];
     if (badgeEarned && !updatedBadges.includes(badgeEarned)) {
@@ -592,23 +689,20 @@ router.post('/challenges/:id/progress', async (req, res) => {
 // 13. Get leaderboard
 router.get('/leaderboard', async (req, res) => {
   try {
-    const snapshot = await db.collection('users').get();
-    const users = snapshot.docs.map(doc => {
-      const data = doc.data();
-      return {
-        id: doc.id,
-        name: data.name || doc.id,
-        points: data.points || 0,
-        avatar: data.avatar || 'https://lh3.googleusercontent.com/aida-public/AB6AXuAT1EPgeHbiCyiDKLGp868IabVBLWQJe-FbA4S09aQJipuS6tXAJnHYJnoD4VL-TBLlnzm4xoCEkS_WlOmVhbeXjuNHry4GZPGKfJ5_iQ8X-fVs2ZENwqa0MK2sTi6dgD_hmctOs2tY1U0dbsRFDclOP1Sy81nI9zy56ULwxCR3EAsmngeA71gDstnUUoOs0PVxPurXRdI32iJ5ScLE0CjWgOYh6n808_7lSn7PlX4m0EkobLUHN1beT5h43E4UGhZjiUdK2JjYPK9R',
-        title: data.title || 'Eco Novice',
-      };
-    });
+    const users = await getAllUsersCached();
+    const formattedUsers = users.map(user => ({
+      id: user.id,
+      name: user.name,
+      points: user.points,
+      avatar: user.avatar,
+      title: user.title,
+    }));
 
     // Sort leaderboard desc
-    users.sort((a, b) => b.points - a.points);
+    formattedUsers.sort((a, b) => b.points - a.points);
     
     // Format response
-    const rankedLeaderboard = users.map((user, index) => {
+    const rankedLeaderboard = formattedUsers.map((user, index) => {
       const rank = index + 1;
       let borderColor = 'rgba(255,255,255,0.08)';
       let bg = 'rgba(255, 255, 255, 0.03)';
@@ -639,19 +733,16 @@ router.get('/leaderboard', async (req, res) => {
 // 13b. Get all users
 router.get('/users', async (req, res) => {
   try {
-    const snapshot = await db.collection('users').get();
-    const users = snapshot.docs.map(doc => {
-      const data = doc.data();
-      return {
-        id: doc.id,
-        name: data.name || doc.id,
-        email: data.email || '',
-        avatar: data.avatar || 'https://lh3.googleusercontent.com/aida-public/AB6AXuAT1EPgeHbiCyiDKLGp868IabVBLWQJe-FbA4S09aQJipuS6tXAJnHYJnoD4VL-TBLlnzm4xoCEkS_WlOmVhbeXjuNHry4GZPGKfJ5_iQ8X-fVs2ZENwqa0MK2sTi6dgD_hmctOs2tY1U0dbsRFDclOP1Sy81nI9zy56ULwxCR3EAsmngeA71gDstnUUoOs0PVxPurXRdI32iJ5ScLE0CjWgOYh6n808_7lSn7PlX4m0EkobLUHN1beT5h43E4UGhZjiUdK2JjYPK9R',
-        points: data.points || 0,
-        title: data.title || 'Eco Novice',
-      };
-    });
-    res.json(users);
+    const users = await getAllUsersCached();
+    const usersList = users.map(user => ({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      avatar: user.avatar,
+      points: user.points,
+      title: user.title,
+    }));
+    res.json(usersList);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -729,6 +820,7 @@ router.post('/users', async (req, res) => {
     };
 
     await db.collection('users').doc(userId).set(newProfile);
+    usersCache = null; // Invalidate cache
 
     res.json({
       success: true,
@@ -745,6 +837,13 @@ router.post('/users', async (req, res) => {
 router.post('/offsets/purchase', async (req, res) => {
   const userId = getRequestUserId(req);
   const { offsetId, cost } = req.body;
+
+  if (offsetId !== '1' && offsetId !== '2' && offsetId !== '3' && offsetId !== '4') {
+    return res.status(400).json({ error: 'Invalid offset ID parameter' });
+  }
+  if (typeof cost !== 'number' || cost <= 0 || isNaN(cost)) {
+    return res.status(400).json({ error: 'Cost must be a valid positive number' });
+  }
   
   try {
     const pointsReward = Math.max(Math.round((cost || 10) * 2.5), 50);
@@ -762,6 +861,7 @@ router.post('/offsets/purchase', async (req, res) => {
     };
     
     await db.collection('users').doc(userId).set(updatedProfile);
+    usersCache = null; // Invalidate cache
     
     res.json({
       success: true,
